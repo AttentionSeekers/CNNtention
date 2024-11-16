@@ -10,7 +10,7 @@ Created on 2024-11-16 19:32:54 Saturday
 # TODO: need to add hamilton decorators
 # TODO: need to add mlflow tracking
 
-
+# entry point
 def start():
     # params to be added:
     # - which dataset
