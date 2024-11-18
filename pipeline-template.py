@@ -5,102 +5,114 @@ Created on 2024-11-16 19:32:54 Saturday
 
 @author: Nikhil Kapila
 """
+import argparse
 
-import torch, torchvision, skorch, mlflow, mlflow.sklearn, argparse
-import torchvision.transforms as transforms
+import torch, torchvision, mlflow, mlflow.sklearn
+from matplotlib import pyplot as plt
 from skorch import NeuralNetClassifier
-from sklearn.model_selection import train_test_split
-import models.squeezenet as resnet #TODO: implement resnet_cbam in models/ and change here
+from experiment_configs import configs, ModelConfig, DataConfig
+import numpy as np
 
 RANDOM_VAR = 10
 
-def load_data(name='CIFAR-10'): # default is cifar-10
-    transform = transforms.Compose([
-        # TODO: Need to add different augmentation from Resnet paper.
-        # Can be a tuning hyperparam too?
-    ])
 
-    if (name=='CIFAR-10'):
-        train_d = torchvision.datasets.CIFAR10(root='./data',
-                                        train=True,
-                                        download=True,
-                                        transform=transform)
-        test = torchvision.datasets.CIFAR10(root='./data',
-                                            train=False,
-                                            download=True,
-                                            transform=transform)
-    
-    train, val = train_test_split(train_d, random_state=RANDOM_VAR, test_size=5000)
-    return train, val, test
+def load_data(config: DataConfig):
+    if config.name == 'CIFAR-10':
+        train_set = torchvision.datasets.CIFAR10(root='./data',
+                                                 train=True,
+                                                 download=True,
+                                                 transform=config.train_transform)
+        test_set = torchvision.datasets.CIFAR10(root='./data',
+                                                train=False,
+                                                download=True,
+                                                transform=config.test_transform
+                                                )
+    elif config.name == 'CIFAR-100':
+        train_set = torchvision.datasets.CIFAR100(root='./data',
+                                                  train=True,
+                                                  download=True,
+                                                  transform=config.train_transform)
+        test_set = torchvision.datasets.CIFAR100(root='./data',
+                                                 train=False,
+                                                 download=True,
+                                                 transform=config.test_transform
+                                                 )
+    else:
+        raise ValueError('Unknown dataset')
 
-def train(train, val, lr, batch, epochs):
-    # TODO: Other args to be passed, l2 reg, optimizer etc as call back
-    # l2 reg: https://skorch.readthedocs.io/en/stable/user/FAQ.html#how-do-i-apply-l2-regularization
-    # callback: https://skorch.readthedocs.io/en/stable/user/callbacks.html
+    return train_set, test_set
+
+
+def train(train_set, model_config: ModelConfig):
     network = NeuralNetClassifier(
-        resnet, #TODO: placeholder, import path to be changed in line 13.
-        max_epochs=epochs,
-        lr=lr,
-        batch_size=batch,
-        optimizer=torch.nn.optim.Adam, #TODO: Is this the same Opt in the ResNet paper? (Maybe irrelevant question since tuning can have a different optimizer)
+        model_config.model,
+        max_epochs=model_config.max_epochs,
+        lr=model_config.lr,
+        batch_size=model_config.batch_size,
+        optimizer=model_config.optimizer,
+        optimizer__weight_decay=model_config.weight_decay,
+        optimizer__momentum=model_config.momentum,
         device='cuda' if torch.cuda.is_available() else 'cpu',
+        criterion=torch.nn.NLLLoss,  # this is the loss
         callbacks=[
             # TODO: Any other callbacks that may be required for plots
+            # (this might be relevant for GradCAM)
         ]
     )
 
-    network.fit(train)
+    # TODO this may still be wrong! not sure how to call fit correctly with skorch
+    return network.fit(train_set, np.array(train_set.targets))  # not sure yet why this is necessary
 
-    for epoch, row in enumerate(network.history):
-        train_loss = row['train_loss']
-        mlflow.log_metric('loss_train', train_loss, step=epoch)
-        # TODO: Need to check if it logs loss (I think skorch does this automatically)
 
-        # TODO: TO CHECK:
-        # Resnet paper splits into 45k train, 5k val and 5k test.
-        # Tuning: Model is trained on 45k train, validated on 5k val.
-        val_loader = torch.utils.data.DataLoader(val, batch_size=batch, shuffle=False)
-        val_loss, val_tot = 0.0, 0
-        with torch.no_grad():
-            for inputs, targets in val_loader:
-                val_loss += network.criterion_(network.module_(inputs), targets).item() * inputs.size(0)
-                val_tot /= inputs.size(0)
-        val_loss /= val_tot
-        mlflow.log_metric('loss_val', val_loss, step=epoch)
-    
-    return network
+def eval_model(network):
+    train_loss = network.history[:, 'train_loss']
+    # mlflow.log_metric('train_loss', train_loss)
 
-def eval_model():
-    # TODO
-    pass
+    valid_loss = network.history[:, 'valid_loss']
+    # mlflow.log_metric('valid_loss', valid_loss)
 
-def plot():
-    # TODO: Complete this using matplotlib
-    # refer here: 
-    pass
+    return train_loss, valid_loss
 
-def main(lr=1e-4, batch=128, epochs=50, dataset='CIFAR-10'): # cmdLine=True):
-    # OPTIONAL command line invoke
-    # if cmdLine:
-    #     parser = argparse.ArgumentParser(description='CNN Att train pipeline')
-    #     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
-    #     parser.add_argument('--batch', type=int, default=128, help='Batch size')
-    #     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
-    #     args = parser.parse_args()
-    #     lr, batch, epochs = args.lr, args.batch, args.epochs
+
+def plot(train_loss, valid_loss):
+    # Train / Valid Loss plot
+    epochs = range(1, len(train_loss) + 1)
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs, train_loss, label='Training Loss', marker='o')
+    plt.plot(epochs, valid_loss, label='Validation Loss', marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title('Training and Validation Loss')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+def log_initial_params(config):
+    mlflow.log_param('lr', config.model_config.lr)
+    mlflow.log_param('batch_size', config.model_config.batch_size),
+    mlflow.log_param('max_epochs', config.model_config.max_epochs)
+
+
+def main(config_id='debug_config'):  # either change here or just call main from command line with arg
+    config = configs[config_id]
+
     with mlflow.start_run():
-        mlflow.log_param('lr', lr)
-        mlflow.log_param('batch_size', batch),
-        mlflow.log_param('max_epochs', epochs)
-        
-        train, val, test = load_data(dataset)
-        # TODO
-    
-    
+        log_initial_params(config)
+
+        train_set, test_set = load_data(config.data_config)
+
+        trained_network = train(train_set, config.model_config)
+
+        train_loss, valid_loss = eval_model(trained_network)
+
+        plot(train_loss, valid_loss)
+
 
 if __name__ == '__main__':
-    main()
-    # main(cmdLine=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("config_id", type=str, )
+    args = parser.parse_args()
 
-
-
+    main(args.config_id)
