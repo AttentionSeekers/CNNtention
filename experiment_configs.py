@@ -6,6 +6,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 from torchvision.models.resnet import BasicBlock
 from torchvision.transforms import transforms
 
+from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
 
 
@@ -99,7 +100,7 @@ def _get_cifar10_original_paper_config(model):
                     32000 // iterations_per_epoch, # == 91
                     48000 // iterations_per_epoch # == 136
                 ],
-                gamma=0.1
+                gamma=0.1 # this is the multiplication factor ("divide it by 10")
             )
         )
     )
@@ -137,5 +138,12 @@ configs = {
             [9, 9, 9],
             10
         )
-    )
+    ),
+    "cifar10_resnet20_cbam_baseline": _get_cifar10_original_paper_config(
+        Cifar10ResNet(
+            CBAMBlock, # TODO block not yet implemented properly
+            [3, 3, 3],
+            10
+        )
+    ),
 }
