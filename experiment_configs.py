@@ -85,7 +85,7 @@ def _get_cifar10_original_paper_config(model):
             # Quote: "These models are trained with mini-batch size of 128"
             batch_size=128,
             # Quote: "terminate training at 64k iterations"
-            max_epochs=64000 // iterations_per_epoch,
+            max_epochs=64000 // iterations_per_epoch, # == 182
             # Quote: "We use a weight decay of 0.0001"
             weight_decay=0.0001,
             # Quote: "and momentum of 0.9"
@@ -114,6 +114,27 @@ configs = {
         Cifar10ResNet(
             BasicBlock,
             [3, 3, 3],
+            10
+        )
+    ),
+    "cifar10_resnet32_original_paper": _get_cifar10_original_paper_config(
+        Cifar10ResNet(
+            BasicBlock,
+            [5, 5, 5],
+            10
+        )
+    ),
+    "cifar10_resnet44_original_paper": _get_cifar10_original_paper_config(
+        Cifar10ResNet(
+            BasicBlock,
+            [7, 7, 7],
+            10
+        )
+    ),
+    "cifar10_resnet56_original_paper": _get_cifar10_original_paper_config(
+        Cifar10ResNet(
+            BasicBlock,
+            [9, 9, 9],
             10
         )
     )

@@ -9,6 +9,7 @@ import argparse
 
 import torch, torchvision, mlflow, mlflow.sklearn
 from matplotlib import pyplot as plt
+from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
 from experiment_configs import configs, ModelConfig, DataConfig
 import numpy as np
@@ -67,14 +68,21 @@ def train(train_set, model_config: ModelConfig):
     return network.fit(train_set, np.array(train_set.targets))
 
 
-def eval_model(network):
+def eval_model(network, test_set):
     train_loss = network.history[:, 'train_loss']
     # mlflow.log_metric('train_loss', train_loss)
 
     valid_loss = network.history[:, 'valid_loss']
     # mlflow.log_metric('valid_loss', valid_loss)
 
-    return train_loss, valid_loss
+    # calculate error like they do in the original resnet paper
+    predictions = network.predict(test_set)
+    accuracy = accuracy_score(test_set.targets, predictions)
+    error = 100 * (1 - accuracy)
+    print(f'Test set accuracy: {accuracy}')
+    print(f'Test set error: {error}')
+
+    return train_loss, valid_loss, accuracy, error
 
 
 def plot(train_loss, valid_loss):
@@ -108,7 +116,7 @@ def main(config_id):  # either add default param here or just call main from com
 
         trained_network = train(train_set, config.model_config)
 
-        train_loss, valid_loss = eval_model(trained_network)
+        train_loss, valid_loss, accuracy, error = eval_model(trained_network, test_set)
 
         plot(train_loss, valid_loss)
 
