@@ -44,6 +44,12 @@ def load_data(config: DataConfig):
 
 
 def train(train_set, model_config: ModelConfig):
+    callbacks = []
+
+    if model_config.scheduler is not None:
+        callbacks.append(model_config.scheduler)
+
+
     network = NeuralNetClassifier(
         model_config.model,
         max_epochs=model_config.max_epochs,
@@ -53,15 +59,12 @@ def train(train_set, model_config: ModelConfig):
         optimizer__weight_decay=model_config.weight_decay,
         optimizer__momentum=model_config.momentum,
         device='cuda' if torch.cuda.is_available() else 'cpu',
-        criterion=torch.nn.NLLLoss,  # this is the loss
-        callbacks=[
-            # TODO: Any other callbacks that may be required for plots
-            # (this might be relevant for GradCAM)
-        ]
+        criterion=torch.nn.CrossEntropyLoss,
+        callbacks=callbacks
     )
 
     # TODO this may still be wrong! not sure how to call fit correctly with skorch
-    return network.fit(train_set, np.array(train_set.targets))  # not sure yet why this is necessary
+    return network.fit(train_set, np.array(train_set.targets))
 
 
 def eval_model(network):
@@ -95,7 +98,7 @@ def log_initial_params(config):
     mlflow.log_param('max_epochs', config.model_config.max_epochs)
 
 
-def main(config_id='debug_config'):  # either change here or just call main from command line with arg
+def main(config_id):  # either add default param here or just call main from command line with arg
     config = configs[config_id]
 
     with mlflow.start_run():
