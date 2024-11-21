@@ -137,7 +137,7 @@ class Cifar10ResNet(nn.Module):
         #    stride = 1
 
         if stride != 1 or self.inplanes != planes * block.expansion:
-            # We need to use Global Average Pooling instead of the 1x1 convolutions
+            # This changed is there to match Option A for shortcuts from the paper
             # Original:
             #    downsample = nn.Sequential(
             #        conv1x1(self.inplanes, planes * block.expansion, stride),
