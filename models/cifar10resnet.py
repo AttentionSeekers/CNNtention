@@ -137,10 +137,20 @@ class Cifar10ResNet(nn.Module):
         #    stride = 1
 
         if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                conv1x1(self.inplanes, planes * block.expansion, stride),
-                norm_layer(planes * block.expansion),
-            )
+            # We need to use Global Average Pooling instead of the 1x1 convolutions
+            # Original:
+            #    downsample = nn.Sequential(
+            #        conv1x1(self.inplanes, planes * block.expansion, stride),
+            #        norm_layer(planes * block.expansion),
+            #    )
+            #
+            # Quote: "For both options, when the shortcuts go across feature maps of two sizes,
+            # they are performed with a stride of 2."
+            #
+            # Note that average pooling is not explicity mentioned, but after there were still deviations
+            # with the first implementation, I checked what they do
+            # here and copied it: https://github.com/a-martyn/resnet/blob/master/resnet.py#L77
+            downsample = nn.AvgPool2d(kernel_size=1, stride=2)
 
         layers = []
         layers.append(

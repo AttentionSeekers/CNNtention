@@ -1,11 +1,13 @@
 # Entire file copied + adapted from source: https://raw.githubusercontent.com/pytorch/vision/refs/heads/main/torchvision/models/resnet.py
+# we need some adaptions of the basic block (see comment below) to reproduce the results
 
 import torch.nn as nn
 from typing import Any, Callable, List, Optional, Type, Union
 from torch import Tensor
-from models.cifar10resnet import conv3x3
 import torch
-class CBAMBlock(nn.Module):
+from models.cifar10resnet import conv3x3
+
+class OriginalBasicBlock(nn.Module):
     expansion: int = 1
 
     def __init__(
@@ -32,6 +34,7 @@ class CBAMBlock(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = norm_layer(planes)
+        self.relu2 = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
 
@@ -45,8 +48,6 @@ class CBAMBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
-        # TODO CBAM needs to be applied here
-
         # This has to be changed to support Option A from the paper
         # Original:
         #    if self.downsample is not None:
@@ -56,11 +57,10 @@ class CBAMBlock(nn.Module):
         #     "we consider two options: (A) The shortcut still
         #     performs identity mapping, with extra zero entries padded
         #     for increasing dimensions. This option introduces no extra
-        #     parameter; (B) The projection shortcut in Eqn.(2) is used to
-        #     match dimensions (done by 1X1 convolutions). For both
-        #     options, when the shortcuts go across feature maps of two
-        #     sizes, they are performed with a stride of 2."
+        #     parameter [...] For both options, when the shortcuts go across feature maps,
+        #     they are performed with a stride of 2."
         #
+        # Note: For now I think Option (A) is closer to the paper results.
         if x.shape != out.shape:
             downsampled = self.downsample(x)
             padded = torch.zeros_like(downsampled)
@@ -69,8 +69,8 @@ class CBAMBlock(nn.Module):
             out = out + x
 
 
-        out += identity
-        out = self.relu(out)
+
+        out = self.relu2(out)
 
         return out
 

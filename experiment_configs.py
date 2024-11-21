@@ -8,6 +8,7 @@ from torchvision.transforms import transforms
 
 from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
+from models.originalBasicBlock import OriginalBasicBlock
 
 
 class ExperimentConfig:
@@ -113,28 +114,28 @@ configs = {
     ),
     "cifar10_resnet20_original_paper": _get_cifar10_original_paper_config(
         Cifar10ResNet(
-            BasicBlock,
+            OriginalBasicBlock,
             [3, 3, 3],
             10
         )
     ),
     "cifar10_resnet32_original_paper": _get_cifar10_original_paper_config(
         Cifar10ResNet(
-            BasicBlock,
+            OriginalBasicBlock,
             [5, 5, 5],
             10
         )
     ),
     "cifar10_resnet44_original_paper": _get_cifar10_original_paper_config(
         Cifar10ResNet(
-            BasicBlock,
+            OriginalBasicBlock,
             [7, 7, 7],
             10
         )
     ),
     "cifar10_resnet56_original_paper": _get_cifar10_original_paper_config(
         Cifar10ResNet(
-            BasicBlock,
+            OriginalBasicBlock,
             [9, 9, 9],
             10
         )
