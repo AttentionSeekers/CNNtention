@@ -56,11 +56,10 @@ class CBAMBlock(nn.Module):
         #     "we consider two options: (A) The shortcut still
         #     performs identity mapping, with extra zero entries padded
         #     for increasing dimensions. This option introduces no extra
-        #     parameter; (B) The projection shortcut in Eqn.(2) is used to
-        #     match dimensions (done by 1X1 convolutions). For both
-        #     options, when the shortcuts go across feature maps of two
-        #     sizes, they are performed with a stride of 2."
+        #     parameter [...] For both options, when the shortcuts go across feature maps,
+        #     they are performed with a stride of 2."
         #
+        # Note: For now I think Option (A) is closer to the paper results.
         if x.shape != out.shape:
             downsampled = self.downsample(x)
             padded = torch.zeros_like(downsampled)
@@ -68,8 +67,6 @@ class CBAMBlock(nn.Module):
         else:
             out = out + x
 
-
-        out += identity
         out = self.relu(out)
 
         return out
