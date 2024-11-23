@@ -10,6 +10,7 @@ from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
 from models.originalBasicBlock import OriginalBasicBlock
 
+RANDOM_VAR = 10
 
 class ExperimentConfig:
     def __init__(self, data_config, model_config):
@@ -56,13 +57,17 @@ class ModelConfig:
 
 
 def _get_cifar10_original_paper_config(model):
+    # see https://github.com/a-martyn/resnet/blob/master/main.ipynb
+    means = [0.4918687901200927, 0.49185976472299225, 0.4918583862227116]
+    stds = [0.24697121702736, 0.24696766978537033, 0.2469719877121087]
+
     iterations_per_epoch = 45000 // 128 # == 351
     return ExperimentConfig(
         data_config=DataConfig(
             name='CIFAR-10',
             # Quote: "which consists of 50k training images and 10k test images"
             test_size=10000,
-            # MISSING Quote 1: "The network inputs are 32x32 images, with the per-pixel mean subtracted"
+            # Quote 1: "The network inputs are 32x32 images, with the per-pixel mean subtracted"
             # Quote 2: "We follow the simple data augmentation in [24] for training:
             # 4 pixels are padded on each side, and a 32x32 is randomly sampled
             # from the padded image or its horizontal flip."
@@ -70,11 +75,13 @@ def _get_cifar10_original_paper_config(model):
                 transforms.RandomHorizontalFlip(0.5),
                 transforms.RandomCrop(32, padding=4),
                 transforms.ToTensor(),
+                transforms.Normalize(mean=means, std=stds)
             ]),
-            # MISSING Quote 1: "The network inputs are 32x32 images, with the per-pixel mean subtracted"
+            # Quote 1: "The network inputs are 32x32 images, with the per-pixel mean subtracted"
             # Quote 2: "For testing, we only evaluate the single view of the original 32x32 image".
             test_transform=transforms.Compose([
                 transforms.ToTensor(),
+                transforms.Normalize(mean=means, std=stds)
             ])
 
         ),
@@ -93,7 +100,7 @@ def _get_cifar10_original_paper_config(model):
             # Quote: "and momentum of 0.9"
             momentum=0.9,
             # Quote: "which is determined on a 45k/5k train/val split"
-            train_split=ValidSplit(0.9),
+            train_split=ValidSplit(0.1, stratified=False, random_state=RANDOM_VAR),
             # Quote: "divide it by 10 at 32k and 48k iterations"
             scheduler=LRScheduler(
                 policy=MultiStepLR,

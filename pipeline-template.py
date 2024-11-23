@@ -14,9 +14,6 @@ from skorch import NeuralNetClassifier
 from experiment_configs import configs, ModelConfig, DataConfig
 import numpy as np
 
-RANDOM_VAR = 10
-
-
 def load_data(config: DataConfig):
     if config.name == 'CIFAR-10':
         train_set = torchvision.datasets.CIFAR10(root='./data',
@@ -53,12 +50,13 @@ def train(train_set, model_config: ModelConfig):
 
     network = NeuralNetClassifier(
         model_config.model,
-        max_epochs=model_config.max_epochs,
         lr=model_config.lr,
-        batch_size=model_config.batch_size,
         optimizer=model_config.optimizer,
+        batch_size=model_config.batch_size,
+        max_epochs=model_config.max_epochs,
         optimizer__weight_decay=model_config.weight_decay,
         optimizer__momentum=model_config.momentum,
+        train_split=model_config.train_split,
         device='cuda' if torch.cuda.is_available() else 'cpu',
         criterion=torch.nn.CrossEntropyLoss,
         callbacks=callbacks

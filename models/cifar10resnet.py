@@ -15,9 +15,9 @@ def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, d
         kernel_size=3,
         stride=stride,
         padding=dilation,
-        groups=groups,
+        #groups=groups,
         bias=False,
-        dilation=dilation,
+        #dilation=dilation,
     )
 
 
@@ -98,7 +98,7 @@ class Cifar10ResNet(nn.Module):
         # Original: self.fc = nn.Linear(512 * block.expansion, num_classes)
         # Quote: "The network ends with a global average pooling (above), a 10-way fully-connected layer and softmax."
         # I think softmax is not required here and will be done by loss
-        self.fc = nn.Linear(64 * block.expansion, num_classes)
+        self.fc = nn.Linear(64, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -125,7 +125,7 @@ class Cifar10ResNet(nn.Module):
         planes: int,
         blocks: int,
         stride: int = 1,
-        dilate: bool = False,
+        # dilate: bool = False,
     ) -> nn.Sequential:
         norm_layer = self._norm_layer
         downsample = None
@@ -136,7 +136,7 @@ class Cifar10ResNet(nn.Module):
         #     self.dilation *= stride
         #    stride = 1
 
-        if stride != 1 or self.inplanes != planes * block.expansion:
+        if stride != 1 or self.inplanes != planes: #  * block.expansion (not required as always == 1)
             # This changed is there to match Option A for shortcuts from the paper
             # Original:
             #    downsample = nn.Sequential(
@@ -158,7 +158,7 @@ class Cifar10ResNet(nn.Module):
                 self.inplanes, planes, stride, downsample, self.groups, self.base_width, previous_dilation, norm_layer
             )
         )
-        self.inplanes = planes * block.expansion
+        self.inplanes = planes # * block.expansion (not required as always == 1)
         for _ in range(1, blocks):
             layers.append(
                 block(

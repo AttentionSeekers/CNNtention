@@ -61,14 +61,14 @@ class OriginalBasicBlock(nn.Module):
         #     they are performed with a stride of 2."
         #
         # Note: For now I think Option (A) is closer to the paper results.
+        #
+        # Adapted from: https://github.com/a-martyn/resnet/blob/master/resnet.py#L80
         if x.shape != out.shape:
             downsampled = self.downsample(x)
             padded = torch.zeros_like(downsampled)
             out = out + torch.cat((downsampled, padded), dim=1)
         else:
             out = out + x
-
-
 
         out = self.relu2(out)
 
