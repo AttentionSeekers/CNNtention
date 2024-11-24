@@ -11,6 +11,8 @@ import torch, torchvision, mlflow, mlflow.sklearn
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
+from skorch.callbacks import Checkpoint
+
 from experiment_configs import configs, ModelConfig, DataConfig
 import numpy as np
 
@@ -47,6 +49,13 @@ def train(train_set, model_config: ModelConfig):
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)
 
+    callbacks.append(
+        Checkpoint(monitor='valid_loss_best', f_params='best_model_params_valid_loss.pt')
+    )
+
+    callbacks.append(
+        Checkpoint(monitor='valid_acc_best', f_params='best_model_params_valid_acc.pt')
+    )
 
     network = NeuralNetClassifier(
         model_config.model,
@@ -63,7 +72,15 @@ def train(train_set, model_config: ModelConfig):
     )
 
     # TODO this may still be wrong! not sure how to call fit correctly with skorch
-    return network.fit(train_set, np.array(train_set.targets))
+    fitted_net = network.fit(train_set, np.array(train_set.targets))
+
+    best_valid_loss_net = NeuralNetClassifier(model_config.model)
+    best_valid_loss_net.load_params(f_params='best_model_params_valid_loss.pt')
+
+    best_valid_acc_net = NeuralNetClassifier(model_config.model)
+    best_valid_acc_net.load_params(f_params='best_model_params_valid_acc.pt')
+
+    return fitted_net, best_valid_loss_net, best_valid_acc_net
 
 
 def eval_model(network, test_set):
@@ -112,10 +129,13 @@ def main(config_id):  # either add default param here or just call main from com
 
         train_set, test_set = load_data(config.data_config)
 
-        trained_network = train(train_set, config.model_config)
+        trained_network, best_valid_loss_net, best_valid_acc_net = train(train_set, config.model_config)
 
         train_loss, valid_loss, accuracy, error = eval_model(trained_network, test_set)
-
+        plot(train_loss, valid_loss)
+        train_loss, valid_loss, accuracy, error = eval_model(best_valid_loss_net, test_set)
+        plot(train_loss, valid_loss)
+        train_loss, valid_loss, accuracy, error = eval_model(best_valid_acc_net, test_set)
         plot(train_loss, valid_loss)
 
 
@@ -124,4 +144,9 @@ if __name__ == '__main__':
     parser.add_argument("config_id", type=str, )
     args = parser.parse_args()
 
-    main(args.config_id)
+    #main(args.config_id)
+    main("cifar10_resnet20_original_paper")
+    main("cifar10_resnet32_original_paper")
+    main("cifar10_resnet44_original_paper")
+    main("cifar10_resnet56_original_paper")
+
