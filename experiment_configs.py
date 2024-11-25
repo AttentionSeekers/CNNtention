@@ -61,7 +61,8 @@ def _get_cifar10_original_paper_config(model):
     means = [0.4918687901200927, 0.49185976472299225, 0.4918583862227116]
     stds = [0.24697121702736, 0.24696766978537033, 0.2469719877121087]
 
-    iterations_per_epoch = 45000 // 128 # == 351
+    # iterations_per_epoch = 45000 // 128 # == 351
+    iterations_per_epoch = 164 # == 50000/351
     return ExperimentConfig(
         data_config=DataConfig(
             name='CIFAR-10',
@@ -94,7 +95,7 @@ def _get_cifar10_original_paper_config(model):
             # Quote: "These models are trained with mini-batch size of 128"
             batch_size=128,
             # Quote: "terminate training at 64k iterations"
-            max_epochs=64000 // iterations_per_epoch, # == 182
+            max_epochs= 64000 // iterations_per_epoch, # == 182
             # Quote: "We use a weight decay of 0.0001"
             weight_decay=0.0001,
             # Quote: "and momentum of 0.9"
@@ -105,8 +106,8 @@ def _get_cifar10_original_paper_config(model):
             scheduler=LRScheduler(
                 policy=MultiStepLR,
                 milestones=[
-                    32000 // iterations_per_epoch, # == 91
-                    48000 // iterations_per_epoch # == 136
+                    82, # 32000 // iterations_per_epoch, # == 91
+                    123, # 48000 // iterations_per_epoch # == 136
                 ],
                 gamma=0.1 # this is the multiplication factor ("divide it by 10")
             )
