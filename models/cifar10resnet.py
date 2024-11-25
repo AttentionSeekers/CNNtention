@@ -7,39 +7,39 @@ from torch import Tensor
 from torchvision.models.resnet import BasicBlock, Bottleneck
 
 
-def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
-    """3x3 convolution with padding"""
-    return nn.Conv2d(
-        in_planes,
-        out_planes,
-        kernel_size=3,
-        stride=stride,
-        padding=dilation,
-        #groups=groups,
-        bias=False,
-        #dilation=dilation,
-    )
+#def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
+#    """3x3 convolution with padding"""
+#    return nn.Conv2d(
+#        in_planes,
+#        out_planes,
+#        kernel_size=3,
+#        stride=stride,
+#        padding=dilation,
+#        #groups=groups,
+#        bias=False,
+#        #dilation=dilation,
+#    )
 
 
-def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> nn.Conv2d:
-    """1x1 convolution"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+#def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> nn.Conv2d:
+#    """1x1 convolution"""
+#    return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
 class Cifar10ResNet(nn.Module):
     def __init__(
         self,
         block: Type[Union[BasicBlock, Bottleneck]],
         layers: List[int],
-        num_classes: int = 1000,
-        groups: int = 1,
-        width_per_group: int = 64,
+        num_classes: int = 10, # 1000,
+        # groups: int = 1,
+        # width_per_group: int = 64,
         # not required: replace_stride_with_dilation: Optional[List[bool]] = None,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+        # norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         super().__init__()
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
-        self._norm_layer = norm_layer
+        # if norm_layer is None:
+        #    norm_layer = nn.BatchNorm2d
+        # self._norm_layer = norm_layer
 
 
         # We adjust the entry convolution, therefore inplanes (number of input channels) needs to be adjusted too
@@ -48,7 +48,7 @@ class Cifar10ResNet(nn.Module):
 
         # This is not required (only leaving the dilation init to not make it undefined
         #
-        self.dilation = 1
+        # self.dilation = 1
         # if replace_stride_with_dilation is None:
         #     # each element in the tuple indicates if we should replace
         #     # the 2x2 stride with a dilated convolution instead
@@ -59,18 +59,18 @@ class Cifar10ResNet(nn.Module):
         #         f"or a 3-element tuple, got {replace_stride_with_dilation}"
         #     )
 
-        self.groups = groups
-        self.base_width = width_per_group
+        # self.groups = groups
+        # self.base_width = width_per_group
 
         # Replace ImageNet entry convolution with CIFAR10 entry convolution
         # Original: self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
         # Quote: "The first layer is 3x3 convolutions"
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False)
 
 
         # Adapt to change of entry convolution above
         # Original: self.bn1 = norm_layer(self.inplanes)
-        self.bn1 = norm_layer(16)
+        self.bn1 = nn.BatchNorm2d(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
 
         # Remove maxpooling
@@ -101,7 +101,7 @@ class Cifar10ResNet(nn.Module):
         self.fc = nn.Linear(64, num_classes)
 
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
                 nn.init.constant_(m.weight, 1)
@@ -127,47 +127,37 @@ class Cifar10ResNet(nn.Module):
         stride: int = 1,
         # dilate: bool = False,
     ) -> nn.Sequential:
-        norm_layer = self._norm_layer
-        downsample = None
+        # norm_layer = self._norm_layer
+        # downsample = None
 
         # Not required as we do not use dilation (only leaving the dilation init)
-        previous_dilation = self.dilation
+        # previous_dilation = self.dilation
         # if dilate:
         #     self.dilation *= stride
         #    stride = 1
 
-        if stride != 1 or self.inplanes != planes: #  * block.expansion (not required as always == 1)
-            # This changed is there to match Option A for shortcuts from the paper
-            # Original:
-            #    downsample = nn.Sequential(
-            #        conv1x1(self.inplanes, planes * block.expansion, stride),
-            #        norm_layer(planes * block.expansion),
-            #    )
-            #
-            # Quote: "For both options, when the shortcuts go across feature maps of two sizes,
-            # they are performed with a stride of 2."
-            #
-            # Note that average pooling is not explicity mentioned, but after there were still deviations
-            # with the first implementation, I checked what they do
-            # here and copied it: https://github.com/a-martyn/resnet/blob/master/resnet.py#L77
-            downsample = nn.AvgPool2d(kernel_size=1, stride=2)
+        # if stride != 1 or self.inplanes != planes: #  * block.expansion (not required as always == 1)
+        #    downsample = nn.Sequential(
+        #        conv1x1(self.inplanes, planes * block.expansion, stride),
+        #        norm_layer(planes * block.expansion),
+        #    )
 
         layers = []
         layers.append(
             block(
-                self.inplanes, planes, stride, downsample, self.groups, self.base_width, previous_dilation, norm_layer
+                self.inplanes, planes, stride #, downsample, self.groups, self.base_width, previous_dilation, norm_layer
             )
         )
-        self.inplanes = planes # * block.expansion (not required as always == 1)
+        self.inplanes = planes * block.expansion
         for _ in range(1, blocks):
             layers.append(
                 block(
                     self.inplanes,
                     planes,
-                    groups=self.groups,
-                    base_width=self.base_width,
-                    dilation=self.dilation,
-                    norm_layer=norm_layer,
+                    # groups=self.groups,
+                    # base_width=self.base_width,
+                    # dilation=self.dilation,
+                    # norm_layer=norm_layer,
                 )
             )
 

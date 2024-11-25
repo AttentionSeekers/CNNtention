@@ -11,6 +11,8 @@ import torch, torchvision, mlflow, mlflow.sklearn
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
+from skorch.callbacks import Checkpoint
+
 from experiment_configs import configs, ModelConfig, DataConfig
 import numpy as np
 
@@ -47,6 +49,9 @@ def train(train_set, model_config: ModelConfig):
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)
 
+    callbacks.append(
+        Checkpoint(monitor='valid_acc_best', f_params='best_model_params_valid_acc.pt', load_best=True)
+    )
 
     network = NeuralNetClassifier(
         model_config.model,
