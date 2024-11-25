@@ -61,7 +61,6 @@ def train(train_set, model_config: ModelConfig, test_set):
         ('valid_err', EpochScoring(valid_err_scoring, name='valid_err'))
     )
 
-    # it seems they do show plots of test error vs. iterations in CIFAR-10 paper (does not work yet because net.predict always gives 5k instead of 10k)
     def test_err_scoring(net, X, y):
         test_preds = net.predict(test_set)
         return 100 - accuracy_score(test_set.targets, test_preds) * 100
@@ -77,6 +76,8 @@ def train(train_set, model_config: ModelConfig, test_set):
         max_epochs=model_config.max_epochs,
         optimizer__weight_decay=model_config.weight_decay,
         optimizer__momentum=model_config.momentum,
+        iterator_train__shuffle=True,
+        iterator_valid__shuffle=False,
         train_split=model_config.train_split,
         device='cuda' if torch.cuda.is_available() else 'cpu',
         criterion=torch.nn.CrossEntropyLoss,
