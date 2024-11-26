@@ -160,12 +160,7 @@ def plot(config, train_loss, valid_loss, valid_err, test_err):
 
 
 def main(config_id):  # either add default param here or just call main from command line with arg
-    config = configs[config_id]
-
-    random.seed(RANDOM_VAR)
-    np.random.seed(RANDOM_VAR)
-    torch.manual_seed(RANDOM_VAR)
-
+    config = configs[config_id]()
     mlflow.set_experiment(experiment_name=config.underscored_lowercased_name)
     with mlflow.start_run():
         train_set, test_set = load_data(config.data_config)

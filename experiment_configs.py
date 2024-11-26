@@ -115,13 +115,13 @@ def _get_cifar10_original_paper_config(experiment_name, model):
     )
 
 
-configs = {
-    "debug_config": ExperimentConfig(
+configs = { # mapping keys to lambdas to ensure that the configs are only loaded upon request. Otherwise, the seed may not be applied and we get non-determinstic results!
+    "debug_config": lambda: ExperimentConfig(
         "Debug Config",
         data_config=DataConfig(),
         model_config=ModelConfig(torchvision.models.SqueezeNet(num_classes=10))
     ),
-    "cifar10_resnet20_original_paper": _get_cifar10_original_paper_config(
+    "cifar10_resnet20_original_paper": lambda: _get_cifar10_original_paper_config(
         "Original ResNet20",
         Cifar10ResNet(
             OriginalBasicBlock,
@@ -129,7 +129,7 @@ configs = {
             10
         )
     ),
-    "cifar10_resnet32_original_paper": _get_cifar10_original_paper_config(
+    "cifar10_resnet32_original_paper": lambda: _get_cifar10_original_paper_config(
         "Original ResNet32",
         Cifar10ResNet(
             OriginalBasicBlock,
@@ -137,7 +137,7 @@ configs = {
             10
         )
     ),
-    "cifar10_resnet44_original_paper": _get_cifar10_original_paper_config(
+    "cifar10_resnet44_original_paper": lambda: _get_cifar10_original_paper_config(
         "Original ResNet44",
         Cifar10ResNet(
             OriginalBasicBlock,
@@ -145,7 +145,7 @@ configs = {
             10
         )
     ),
-    "cifar10_resnet56_original_paper": _get_cifar10_original_paper_config(
+    "cifar10_resnet56_original_paper": lambda: _get_cifar10_original_paper_config(
         "Original ResNet56",
         Cifar10ResNet(
             OriginalBasicBlock,
@@ -153,7 +153,7 @@ configs = {
             10
         )
     ),
-    "cifar10_resnet20_cbam_baseline": _get_cifar10_original_paper_config(
+    "cifar10_resnet20_cbam_baseline": lambda: _get_cifar10_original_paper_config(
 "CBAM ResNet20",
         Cifar10ResNet(
             CBAMBlock, # TODO block not yet implemented properly
