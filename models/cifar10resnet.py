@@ -6,6 +6,9 @@ import torch.nn as nn
 from torch import Tensor
 from torchvision.models.resnet import BasicBlock, Bottleneck
 
+from models.cbamBlock import CBAMBlock
+from models.originalBasicBlock import OriginalBasicBlock
+
 
 #def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
 #    """3x3 convolution with padding"""
@@ -28,7 +31,7 @@ from torchvision.models.resnet import BasicBlock, Bottleneck
 class Cifar10ResNet(nn.Module):
     def __init__(
         self,
-        block: Type[Union[BasicBlock, Bottleneck]],
+        block: Type[Union[OriginalBasicBlock, CBAMBlock]],
         layers: List[int],
         num_classes: int = 10, # 1000,
         # groups: int = 1,
