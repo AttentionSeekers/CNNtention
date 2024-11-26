@@ -110,6 +110,9 @@ def eval_model(network, test_set):
     print(f'Test set accuracy: {accuracy}')
     print(f'Test set error: {error}')
 
+    mlflow.log_metric('final accuracy', accuracy)
+    mlflow.log_metric('final error', error)
+
     return train_loss, valid_loss, valid_err, test_err, accuracy, error
 
 

@@ -95,7 +95,7 @@ def _get_cifar10_original_paper_config(experiment_name, model):
             # Quote: "These models are trained with mini-batch size of 128"
             batch_size=128,
             # Quote: "terminate training at 64k iterations"
-            max_epochs= 1, # 64000 // iterations_per_epoch, # == 182
+            max_epochs=64000 // iterations_per_epoch, # == 182
             # Quote: "We use a weight decay of 0.0001"
             weight_decay=0.0001,
             # Quote: "and momentum of 0.9"
