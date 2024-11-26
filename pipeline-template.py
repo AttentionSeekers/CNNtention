@@ -6,6 +6,7 @@ Created on 2024-11-16 19:32:54 Saturday
 @author: Nikhil Kapila
 """
 import argparse
+import random
 
 import mlflow
 import torch, torchvision
@@ -161,6 +162,7 @@ def plot(config, train_loss, valid_loss, valid_err, test_err):
 def main(config_id):  # either add default param here or just call main from command line with arg
     config = configs[config_id]
 
+    random.seed(RANDOM_VAR)
     np.random.seed(RANDOM_VAR)
     torch.manual_seed(RANDOM_VAR)
 
