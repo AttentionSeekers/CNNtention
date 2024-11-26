@@ -3,7 +3,6 @@ import torchvision
 from skorch.callbacks import LRScheduler
 from skorch.dataset import ValidSplit
 from torch.optim.lr_scheduler import MultiStepLR
-from torchvision.models.resnet import BasicBlock
 from torchvision.transforms import transforms
 
 from models.cbamBlock import CBAMBlock
@@ -13,10 +12,11 @@ from models.originalBasicBlock import OriginalBasicBlock
 RANDOM_VAR = 10
 
 class ExperimentConfig:
-    def __init__(self, data_config, model_config):
+    def __init__(self, experiment_name, data_config, model_config):
+        self.experiment_name = experiment_name
+        self.underscored_lowercased_name = self.experiment_name.replace(" ", "_").lower()
         self.data_config = data_config
         self.model_config = model_config
-
 
 class DataConfig:
     def __init__(
@@ -56,13 +56,14 @@ class ModelConfig:
         self.scheduler = scheduler
 
 
-def _get_cifar10_original_paper_config(model):
+def _get_cifar10_original_paper_config(experiment_name, model):
     # see https://github.com/a-martyn/resnet/blob/master/main.ipynb
     means = [0.4918687901200927, 0.49185976472299225, 0.4918583862227116]
     stds = [0.24697121702736, 0.24696766978537033, 0.2469719877121087]
 
     iterations_per_epoch = 45000 // 128 # == 351
     return ExperimentConfig(
+        experiment_name,
         data_config=DataConfig(
             name='CIFAR-10',
             # Quote: "which consists of 50k training images and 10k test images"
@@ -94,7 +95,7 @@ def _get_cifar10_original_paper_config(model):
             # Quote: "These models are trained with mini-batch size of 128"
             batch_size=128,
             # Quote: "terminate training at 64k iterations"
-            max_epochs= 64000 // iterations_per_epoch, # == 182
+            max_epochs= 1, # 64000 // iterations_per_epoch, # == 182
             # Quote: "We use a weight decay of 0.0001"
             weight_decay=0.0001,
             # Quote: "and momentum of 0.9"
@@ -116,10 +117,12 @@ def _get_cifar10_original_paper_config(model):
 
 configs = {
     "debug_config": ExperimentConfig(
+        "Debug Config",
         data_config=DataConfig(),
         model_config=ModelConfig(torchvision.models.SqueezeNet(num_classes=10))
     ),
     "cifar10_resnet20_original_paper": _get_cifar10_original_paper_config(
+        "Original ResNet20",
         Cifar10ResNet(
             OriginalBasicBlock,
             [3, 3, 3],
@@ -127,6 +130,7 @@ configs = {
         )
     ),
     "cifar10_resnet32_original_paper": _get_cifar10_original_paper_config(
+        "Original ResNet32",
         Cifar10ResNet(
             OriginalBasicBlock,
             [5, 5, 5],
@@ -134,6 +138,7 @@ configs = {
         )
     ),
     "cifar10_resnet44_original_paper": _get_cifar10_original_paper_config(
+        "Original ResNet44",
         Cifar10ResNet(
             OriginalBasicBlock,
             [7, 7, 7],
@@ -141,6 +146,7 @@ configs = {
         )
     ),
     "cifar10_resnet56_original_paper": _get_cifar10_original_paper_config(
+        "Original ResNet56",
         Cifar10ResNet(
             OriginalBasicBlock,
             [9, 9, 9],
@@ -148,6 +154,7 @@ configs = {
         )
     ),
     "cifar10_resnet20_cbam_baseline": _get_cifar10_original_paper_config(
+"CBAM ResNet20",
         Cifar10ResNet(
             CBAMBlock, # TODO block not yet implemented properly
             [3, 3, 3],

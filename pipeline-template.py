@@ -6,13 +6,13 @@ Created on 2024-11-16 19:32:54 Saturday
 @author: Nikhil Kapila
 """
 import argparse
-from random import random
 
-import torch, torchvision, mlflow, mlflow.sklearn
+import mlflow
+import torch, torchvision
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
-from skorch.callbacks import Checkpoint, EpochScoring
+from skorch.callbacks import Checkpoint, EpochScoring, MlflowLogger
 
 from experiment_configs import configs, ModelConfig, DataConfig, RANDOM_VAR
 import numpy as np
@@ -50,10 +50,6 @@ def train(train_set, model_config: ModelConfig, test_set):
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)
 
-    #callbacks.append(
-    #    Checkpoint(monitor='valid_acc_best', load_best=True)
-    #)
-
     def valid_err_scoring(net, X, y):
         valid_preds = net.predict(X)
         return 1 - accuracy_score(y, valid_preds)
@@ -67,6 +63,20 @@ def train(train_set, model_config: ModelConfig, test_set):
     callbacks.append(
         ('test_err', EpochScoring(test_err_scoring, name='test_err', use_caching=False))
     )
+
+    ml_flow_logger = MlflowLogger()
+    callbacks.append(
+        ml_flow_logger
+    )
+
+    # unfortunately, this does not seem to be logged automatically by the Skorch callback
+    # so I did it manually (maybe you find out how it can be done by Skorch)
+    mlflow.log_param('learning_rate', model_config.lr)
+    mlflow.log_param('optimizer', model_config.optimizer.__name__)
+    mlflow.log_param('batch_size', model_config.batch_size)
+    mlflow.log_param('max_epochs', model_config.max_epochs)
+    mlflow.log_param('weight_decay', model_config.weight_decay)
+    mlflow.log_param("momentum", model_config.momentum)
 
     network = NeuralNetClassifier(
         model_config.model,
@@ -84,17 +94,12 @@ def train(train_set, model_config: ModelConfig, test_set):
         callbacks=callbacks
     )
 
-    # TODO this may still be wrong! not sure how to call fit correctly with skorch
     return network.fit(train_set, np.array(train_set.targets))
 
 
 def eval_model(network, test_set):
     train_loss = network.history[:, 'train_loss']
-    # mlflow.log_metric('train_loss', train_loss)
-
     valid_loss = network.history[:, 'valid_loss']
-    # mlflow.log_metric('valid_loss', valid_loss)
-
     valid_err = network.history[:, 'valid_err']
 
     test_err = network.history[:, 'test_err']
@@ -108,7 +113,7 @@ def eval_model(network, test_set):
     return train_loss, valid_loss, valid_err, test_err, accuracy, error
 
 
-def plot(train_loss, valid_loss, valid_err, test_err):
+def plot(config, train_loss, valid_loss, valid_err, test_err):
     # Train / Valid Loss plot
     epochs = range(1, len(train_loss) + 1)
     plt.figure(figsize=(8, 6))
@@ -116,11 +121,11 @@ def plot(train_loss, valid_loss, valid_err, test_err):
     plt.plot(epochs, valid_loss, label='Validation Loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.title('Training and Validation Loss')
+    plt.title(f'{config.experiment_name}: Training and Validation Loss')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig('./plots/train_val_loss.png')
+    plt.savefig(f'./plots/{config.underscored_lowercased_name}_train_val_loss.png')
     plt.show()
 
     # Valid err plot
@@ -129,11 +134,11 @@ def plot(train_loss, valid_loss, valid_err, test_err):
     plt.plot(epochs, valid_err, label='Validation Error')
     plt.xlabel('Epochs')
     plt.ylabel('Error')
-    plt.title('Validation Error')
+    plt.title(f'{config.experiment_name}: Validation Error')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig('./plots/valid_err.png')
+    plt.savefig(f'./plots/{config.underscored_lowercased_name}_valid_err.png')
     plt.show()
 
     # Valid err plot
@@ -142,18 +147,12 @@ def plot(train_loss, valid_loss, valid_err, test_err):
     plt.plot(epochs, test_err, label='Test Error')
     plt.xlabel('Epochs')
     plt.ylabel('Error')
-    plt.title('Test Error')
+    plt.title(f'{config.experiment_name}: Test Error')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig('./plots/test_err.png')
+    plt.savefig(f'./plots/{config.underscored_lowercased_name}_test_err.png')
     plt.show()
-
-
-def log_initial_params(config):
-    mlflow.log_param('lr', config.model_config.lr)
-    mlflow.log_param('batch_size', config.model_config.batch_size),
-    mlflow.log_param('max_epochs', config.model_config.max_epochs)
 
 
 def main(config_id):  # either add default param here or just call main from command line with arg
@@ -162,16 +161,15 @@ def main(config_id):  # either add default param here or just call main from com
     np.random.seed(RANDOM_VAR)
     torch.manual_seed(RANDOM_VAR)
 
+    mlflow.set_experiment(experiment_name=config.underscored_lowercased_name)
     with mlflow.start_run():
-        log_initial_params(config)
-
         train_set, test_set = load_data(config.data_config)
 
         trained_network = train(train_set, config.model_config, test_set)
 
         train_loss, valid_loss, valid_err, test_err, accuracy, error = eval_model(trained_network, test_set)
 
-        plot(train_loss, valid_loss, valid_err, test_err)
+        plot(config, train_loss, valid_loss, valid_err, test_err)
 
 
 if __name__ == '__main__':
