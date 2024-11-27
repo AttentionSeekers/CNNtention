@@ -9,7 +9,7 @@ from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
 from models.originalBasicBlock import OriginalBasicBlock
 
-RANDOM_VAR = 42
+RANDOM_VAR = 10
 
 class ExperimentConfig:
     def __init__(self, experiment_name, data_config, model_config):
