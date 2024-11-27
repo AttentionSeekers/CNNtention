@@ -1,9 +1,8 @@
 # Entire file copied + adapted from source: https://raw.githubusercontent.com/pytorch/vision/refs/heads/main/torchvision/models/resnet.py
 # we need some adaptions of the basic block (see comment below) to reproduce the results
-
+import torch
 import torch.nn as nn
 from torch import Tensor
-import torch.nn.functional as F
 
 class OriginalBasicBlock(nn.Module):
     expansion: int = 1
@@ -31,11 +30,11 @@ class OriginalBasicBlock(nn.Module):
         self.planes = planes
         self.conv1 = nn.Conv2d(inplanes, planes, 3, stride, 1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU()
         self.conv2 = nn.Conv2d(planes, planes, 3, 1, 1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
-        self.relu2 = nn.ReLU(inplace=True)
-        # self.downsample = downsample
+        self.relu2 = nn.ReLU()
+        self.downsample = nn.AvgPool2d(kernel_size=1, stride=2)
         self.stride = stride
 
     def forward(self, x: Tensor) -> Tensor:
@@ -63,10 +62,12 @@ class OriginalBasicBlock(nn.Module):
         # Note: For now I think Option (A) is closer to the paper results.
         #
         # Adapted from: https://github.com/akamaster/pytorch_resnet_cifar10/blob/master/resnet.py
-        if self.inplanes != self.planes or self.stride != 1:
-            out += F.pad(x[:, :, ::2, ::2], (0, 0, 0, 0, self.planes//4, self.planes//4), "constant", 0)
+        if x.shape != out.shape:
+            d = self.downsample(x)
+            p = torch.mul(d, 0)
+            out + torch.cat((d, p), dim=1)
         else:
-            out = out + x
+            out + x
 
         out = self.relu2(out)
 

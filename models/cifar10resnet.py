@@ -74,7 +74,7 @@ class Cifar10ResNet(nn.Module):
         # Adapt to change of entry convolution above
         # Original: self.bn1 = norm_layer(self.inplanes)
         self.bn1 = nn.BatchNorm2d(self.inplanes)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.ReLU()
 
         # Remove maxpooling
         # Original: self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -90,7 +90,7 @@ class Cifar10ResNet(nn.Module):
         # Quote:
         # "The number of filters are {16, 32, 64} respectively".
 
-        self.layer1 = self._make_layer(block, 16, layers[0])
+        self.layer1 = self._make_layer(block, 16, layers[0], stride=1)
         self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 64, layers[2], stride=2)
 
@@ -101,7 +101,7 @@ class Cifar10ResNet(nn.Module):
         # Original: self.fc = nn.Linear(512 * block.expansion, num_classes)
         # Quote: "The network ends with a global average pooling (above), a 10-way fully-connected layer and softmax."
         # I think softmax is not required here and will be done by loss
-        self.fc = nn.Linear(64, num_classes)
+        self.fc = nn.Linear(64, num_classes, bias=True)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
