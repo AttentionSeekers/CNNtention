@@ -141,32 +141,16 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
             10
         )
     ),
-    "cifar10_resnet32_original_paper": lambda: _get_cifar10_original_paper_evaluation_config(
-        "Original ResNet32",
+    "cifar10_resnet20_original_paper_tuning": lambda: _get_cifar10_original_paper_training_config(
+        "Original ResNet20 Tuning",
         Cifar10ResNet(
             OriginalBasicBlock,
-            [5, 5, 5],
-            10
-        )
-    ),
-    "cifar10_resnet44_original_paper": lambda: _get_cifar10_original_paper_evaluation_config(
-        "Original ResNet44",
-        Cifar10ResNet(
-            OriginalBasicBlock,
-            [7, 7, 7],
-            10
-        )
-    ),
-    "cifar10_resnet56_original_paper": lambda: _get_cifar10_original_paper_evaluation_config(
-        "Original ResNet56",
-        Cifar10ResNet(
-            OriginalBasicBlock,
-            [9, 9, 9],
+            [3, 3, 3],
             10
         )
     ),
     "cifar10_resnet20_cbam_baseline_training": lambda: _get_cifar10_original_paper_training_config(
-"CBAM ResNet20",
+"CBAM ResNet20 Tuning",
         Cifar10ResNet(
             CBAMBlock, # TODO block not yet implemented properly
             [3, 3, 3],

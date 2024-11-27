@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-
+import torch.nn.functional as F
 class OriginalBasicBlock(nn.Module):
     expansion: int = 1
 
@@ -34,7 +34,6 @@ class OriginalBasicBlock(nn.Module):
         self.conv2 = nn.Conv2d(planes, planes, 3, 1, 1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
         self.relu2 = nn.ReLU()
-        self.downsample = nn.AvgPool2d(kernel_size=1, stride=2)
         self.stride = stride
 
     def forward(self, x: Tensor) -> Tensor:
@@ -62,12 +61,10 @@ class OriginalBasicBlock(nn.Module):
         # Note: For now I think Option (A) is closer to the paper results.
         #
         # Adapted from: https://github.com/akamaster/pytorch_resnet_cifar10/blob/master/resnet.py
-        if x.shape != out.shape:
-            d = self.downsample(x)
-            p = torch.mul(d, 0)
-            out + torch.cat((d, p), dim=1)
+        if self.inplanes != self.planes or self.stride != 1:
+            out += F.pad(x[:, :, ::2, ::2], (0, 0, 0, 0, self.planes//4, self.planes//4), "constant", 0)
         else:
-            out + x
+            out = out + x
 
         out = self.relu2(out)
 
