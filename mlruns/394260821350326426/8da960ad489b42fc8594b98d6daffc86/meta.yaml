@@ -1,0 +1,15 @@
+artifact_uri: file:///home/julian/repos/CNNtention/mlruns/394260821350326426/8da960ad489b42fc8594b98d6daffc86/artifacts
+end_time: 1732760261195
+entry_point_name: ''
+experiment_id: '394260821350326426'
+lifecycle_stage: active
+run_id: 8da960ad489b42fc8594b98d6daffc86
+run_name: useful-bass-439
+run_uuid: 8da960ad489b42fc8594b98d6daffc86
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1732746824056
+status: 3
+tags: []
+user_id: julian
