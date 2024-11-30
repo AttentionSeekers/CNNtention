@@ -59,7 +59,7 @@ class ModelConfig:
         self.add_test_set_eval = add_test_set_eval
 
 
-def _get_cifar10_original_paper_evaluation_config(experiment_name, model):
+def _get_cifar10_original_paper_evaluation_config(experiment_name, model) -> ExperimentConfig:
     # see https://github.com/a-martyn/resnet/blob/master/main.ipynb
     means = [0.4918687901200927, 0.49185976472299225, 0.4918583862227116]
     stds = [0.24697121702736, 0.24696766978537033, 0.2469719877121087]
@@ -120,10 +120,10 @@ def _get_cifar10_original_paper_evaluation_config(experiment_name, model):
     )
 
 
-def _get_cifar10_original_paper_training_config(experiment_name, model):
+def _get_cifar10_original_paper_training_config(experiment_name, model) -> ExperimentConfig:
     config = _get_cifar10_original_paper_evaluation_config(experiment_name, model)
-    config.model_config.test_split = ValidSplit(0.1, random_state=RANDOM_VAR)
-    config.add_test_set_eval = False
+    config.model_config.train_split = ValidSplit(0.1, random_state=RANDOM_VAR)
+    config.model_config.add_test_set_eval = False
     return config
 
 
