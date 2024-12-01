@@ -1,0 +1,6 @@
+artifact_location: file:///content/drive/MyDrive/cs7643/mlruns/411893921889545428
+creation_time: 1733043703181
+experiment_id: '411893921889545428'
+last_update_time: 1733043703181
+lifecycle_stage: active
+name: selfatt_resnet20_with_logging

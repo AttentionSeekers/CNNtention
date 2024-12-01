@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/411893921889545428/75e82f1561db41bb8e25a72bc40ae111/artifacts
+end_time: 1733068674201
+entry_point_name: ''
+experiment_id: '411893921889545428'
+lifecycle_stage: active
+run_id: 75e82f1561db41bb8e25a72bc40ae111
+run_name: bustling-jay-740
+run_uuid: 75e82f1561db41bb8e25a72bc40ae111
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733056659398
+status: 3
+tags: []
+user_id: root

@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/411893921889545428/0f305d5c07774dd9b1925ec7416fbc52/artifacts
+end_time: 1733052473539
+entry_point_name: ''
+experiment_id: '411893921889545428'
+lifecycle_stage: active
+run_id: 0f305d5c07774dd9b1925ec7416fbc52
+run_name: stylish-fox-497
+run_uuid: 0f305d5c07774dd9b1925ec7416fbc52
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733043703514
+status: 4
+tags: []
+user_id: root
