@@ -1,0 +1,6 @@
+artifact_location: file:///home/julian/repos/CNNtention/mlruns/389231327266794745
+creation_time: 1732995312215
+experiment_id: '389231327266794745'
+last_update_time: 1732995312215
+lifecycle_stage: active
+name: original_resnet20_tuning
