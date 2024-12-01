@@ -7,6 +7,7 @@ from torchvision.transforms import transforms
 
 from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
+from models.resnet_self_att import ResnetSelfAtt
 from models.originalBasicBlock import OriginalBasicBlock
 
 RANDOM_VAR = 10
@@ -153,6 +154,14 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
 "CBAM ResNet20 Tuning",
         Cifar10ResNet(
             CBAMBlock, # TODO block not yet implemented properly
+            [3, 3, 3],
+            10
+        )
+    ),
+    "cifar10_resnet20_self_att_baseline_training": lambda: _get_cifar10_original_paper_training_config(
+"SelfAtt ResNet20 Tuning",
+        ResnetSelfAtt(
+            OriginalBasicBlock,
             [3, 3, 3],
             10
         )
