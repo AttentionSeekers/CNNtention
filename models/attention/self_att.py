@@ -17,7 +17,7 @@ class SelfAtt(nn.Module):
         self.query = nn.Conv2d(in_ch, in_ch, kernel_size=1)
         self.value = nn.Conv2d(in_ch, in_ch, kernel_size=1)
 
-    def forward(self, x): 
+    def forward(self, x, intermediate=False): 
         N, ch, h, w = x.shape
         # value = self.value(x).view(N, -1, h*w) # N, ch, h*w
         key = self.key(x).view(N, -1, h*w) # N, ch, h*w
@@ -38,8 +38,10 @@ class SelfAtt(nn.Module):
 
         value = self.value(x).view(N, -1, h*w) # N, ch, h*w
 
-        return torch.bmm(value, # N, ch, h*w
+        out = torch.bmm(value, # N, ch, h*w
                          attention # N, h*w, h*w
                          ).view( # output of bmm is N, ch, h*w
                              N, ch, h, w)
 
+        if intermediate: return out, attention, query, key
+        else: return out
