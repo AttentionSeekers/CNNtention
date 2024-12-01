@@ -90,7 +90,15 @@ class ResnetSelfAtt(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def _forward_impl(self, x: Tensor) -> Tensor:
+    def _forward_impl(self, x: Tensor, intermediate: bool) -> Tensor:
+        if intermediate:
+            outs = {
+                'conv': [],
+                'att': [],
+                'q': [],
+                'k': []
+            }
+
         # See note [TorchScript super()]
         x = self.conv1(x)
         x = self.bn1(x)
@@ -98,15 +106,36 @@ class ResnetSelfAtt(nn.Module):
 
         # Block 1
         x = self.layer1(x)
-        x = self.att1(x)
+        if intermediate: outs['conv'].append(x)
+
+        if not intermediate: x = self.att1(x, intermediate)
+        elif intermediate: 
+            x, att, q, k = self.att1(x, intermediate)
+            outs['att'].append(att)
+            outs['q'].append(q)
+            outs['k'].append(k)
 
         # Block 2
         x = self.layer2(x)
-        x = self.att2(x)
+        if intermediate: outs['conv'].append(x)
+
+        if not intermediate: x = self.att2(x, intermediate)
+        elif intermediate: 
+            x, att, q, k = self.att2(x, intermediate)
+            outs['att'].append(att)
+            outs['q'].append(q)
+            outs['k'].append(k)
 
         # Block 3
         x = self.layer3(x)
-        x = self.att3(x)
+        if intermediate: outs['conv'].append(x)
+        
+        if not intermediate: x = self.att3(x, intermediate)
+        elif intermediate: 
+            x, att, q, k = self.att3(x, intermediate)
+            outs['att'].append(att)
+            outs['q'].append(q)
+            outs['k'].append(k)
 
         # Avg Pooling
         x = self.avgpool(x)
@@ -115,7 +144,8 @@ class ResnetSelfAtt(nn.Module):
         # Linear classifier
         x = self.fc(x)
 
-        return x
+        if intermediate: return x, outs
+        else: return x
 
-    def forward(self, x: Tensor) -> Tensor:
-        return self._forward_impl(x)
+    def forward(self, x: Tensor, intermediate:bool=False) -> Tensor:
+        return self._forward_impl(x, intermediate)
