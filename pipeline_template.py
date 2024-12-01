@@ -231,6 +231,8 @@ def main(config_id):  # either add default param here or just call main from com
         train_loss, valid_loss, valid_err, train_err, test_err, accuracy, error = eval_model(trained_network, test_set)
 
         plot(config, train_loss, valid_loss, valid_err, train_err, test_err)
+        
+        if config.model_config.log_model: mlflow.pytorch.log_model(trained_network, "model")
 
 
 if __name__ == '__main__':

@@ -12,14 +12,14 @@ from torch import nn
 class SelfAtt(nn.Module):
     def __init__(self, in_ch):
         super(SelfAtt, self).__init__()
-        self.weights = nn.Parameter(torch.zeros(1))
+        # self.weights = nn.Parameter(torch.zeros(1))
         self.key = nn.Conv2d(in_ch, in_ch, kernel_size=1)
         self.query = nn.Conv2d(in_ch, in_ch, kernel_size=1)
         self.value = nn.Conv2d(in_ch, in_ch, kernel_size=1)
 
-    def forward(self, x): 
+    def forward(self, x, intermediate=False): 
         N, ch, h, w = x.shape
-        value = self.value(x).view(N, -1, h*w) # N, ch, h*w
+        # value = self.value(x).view(N, -1, h*w) # N, ch, h*w
         key = self.key(x).view(N, -1, h*w) # N, ch, h*w
         query = self.query(x).view(N, -1, h*w).permute(0, 2 ,1) # N, h*w, ch
 
@@ -38,8 +38,10 @@ class SelfAtt(nn.Module):
 
         value = self.value(x).view(N, -1, h*w) # N, ch, h*w
 
-        return torch.bmm(value, # N, ch, h*w
+        out = torch.bmm(value, # N, ch, h*w
                          attention # N, h*w, h*w
                          ).view( # output of bmm is N, ch, h*w
                              N, ch, h, w)
 
+        if intermediate: return out, attention, query, key
+        else: return out
