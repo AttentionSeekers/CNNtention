@@ -168,7 +168,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
             10
         )
     ),
-    "cifar10_resnet20_self_att_baseline_training": lambda: ExperimentConfig(
+    "cifar10_resnet20_self_att_baseline_training_logging": lambda: ExperimentConfig(
         "SelfAtt ResNet20 with Logging",
         DataConfig(name='CIFAR-10',
                    test_size=10000,
