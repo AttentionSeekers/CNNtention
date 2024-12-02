@@ -23,6 +23,7 @@ class ResnetMultiHeadAtt(nn.Module):
         block: Type[Union[OriginalBasicBlock]],
         layers: List[int],
         num_classes: int = 10, # 1000,
+        num_heads: int=8
     ) -> None:
         super().__init__()
         # We adjust the entry convolution, therefore inplanes (number of input channels) needs to be adjusted too
@@ -44,11 +45,11 @@ class ResnetMultiHeadAtt(nn.Module):
 
         # NK: augmented self attention blocks between resnet blocks
         self.layer1 = self._make_layer(block, 16, layers[0], stride=1)
-        self.att1 = MultiHeadSelfAtt(16)
+        self.att1 = MultiHeadSelfAtt(16, num_heads)
         self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
-        self.att2 = MultiHeadSelfAtt(32)
+        self.att2 = MultiHeadSelfAtt(32, num_heads)
         self.layer3 = self._make_layer(block, 64, layers[2], stride=2)
-        self.att3 = MultiHeadSelfAtt(64)
+        self.att3 = MultiHeadSelfAtt(64, num_heads)
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
