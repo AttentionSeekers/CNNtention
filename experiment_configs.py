@@ -8,6 +8,7 @@ from torchvision.transforms import transforms
 from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
 from models.resnet_self_att import ResnetSelfAtt
+from models.resnet_multi_head_att import ResnetMultiHeadAtt
 from models.originalBasicBlock import OriginalBasicBlock
 
 RANDOM_VAR = 10
@@ -183,8 +184,41 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                 transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
             ])),
         ModelConfig(model=ResnetSelfAtt(OriginalBasicBlock, [3,3,3], 10), 
-                    lr=0.1,
-                    optimizer=torch.optim.SGD,
+                    lr=0.005,
+                    optimizer=torch.optim.Adam,
+                    batch_size=128,
+                    max_epochs=64000//(45000 // 128),
+                    weight_decay=0.0001,
+                    momentum=0.9,
+                    train_split=None,
+                    scheduler=LRScheduler(
+                        policy=MultiStepLR,
+                        milestones=[
+                            32000 // (45000 // 128), # == 91
+                            48000 // (45000 // 128) # == 136
+                        ],
+                        gamma=0.1 # this is the multiplication factor ("divide it by 10")
+                    ),
+                    add_test_set_eval=True,
+                    log_model=True)
+    ),
+    "cifar10_resnet20_multi_head_att": lambda: ExperimentConfig(
+        "MultiHeadAtt ResNet20 with Logging",
+        DataConfig(name='CIFAR-10',
+                   test_size=10000,
+                   train_transform=transforms.Compose([
+                transforms.RandomHorizontalFlip(0.5),
+                transforms.RandomCrop(32, padding=4),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
+            ]),
+            test_transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
+            ])),
+        ModelConfig(model=ResnetMultiHeadAtt(OriginalBasicBlock, [3,3,3], 10), 
+                    lr=0.005,
+                    optimizer=torch.optim.Adam,
                     batch_size=128,
                     max_epochs=64000//(45000 // 128),
                     weight_decay=0.0001,
