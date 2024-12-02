@@ -103,36 +103,28 @@ def train(train_set, model_config: ModelConfig, test_set):
     mlflow.log_param('weight_decay', model_config.weight_decay)
     mlflow.log_param("momentum", model_config.momentum)
 
-    if model_config.optimizer.__name__ == 'Adam':
-        network = NeuralNetClassifier(
-            model_config.model,
-            lr=model_config.lr,
-            optimizer=model_config.optimizer,
-            batch_size=model_config.batch_size,
-            max_epochs=model_config.max_epochs,
-            optimizer__weight_decay=model_config.weight_decay,
-            iterator_train__shuffle=True, # this is important! otherwise each batch across epochs is the same...
-            iterator_valid__shuffle=False,
-            train_split=model_config.train_split,
-            device='cuda' if torch.cuda.is_available() else 'cpu',
-            criterion=torch.nn.CrossEntropyLoss,
-            callbacks=callbacks
-        )
-    else:
-        network = NeuralNetClassifier(
-            model_config.model,
-            lr=model_config.lr,
-            optimizer=model_config.optimizer,
-            batch_size=model_config.batch_size,
-            max_epochs=model_config.max_epochs,
-            optimizer__weight_decay=model_config.weight_decay,
-            optimizer__momentum=model_config.momentum,
-            iterator_train__shuffle=True, # this is important! otherwise each batch across epochs is the same...
-            iterator_valid__shuffle=False,
-            train_split=model_config.train_split,
-            device='cuda' if torch.cuda.is_available() else 'cpu',
-            criterion=torch.nn.CrossEntropyLoss,
-            callbacks=callbacks
+    opt_params = {}
+    opt_params['device'] = 'cuda' if torch.cuda.is_available() else 'cpu'
+    mlflow.log_param('device', opt_params['device'])
+    if model_config.optimizer.__name__ != 'Adam':
+        opt_params['momentum'] = model_config.momentum
+    if model_config.optimizer.__class__.__name__ == 'ResnetMultiHeadAtt':
+      opt_params['num_heads'] = model_config.num_heads
+
+    network = NeuralNetClassifier(
+        model_config.model,
+        lr=model_config.lr,
+        optimizer=model_config.optimizer,
+        batch_size=model_config.batch_size,
+        max_epochs=model_config.max_epochs,
+        optimizer__weight_decay=model_config.weight_decay,
+        # optimizer__momentum=model_config.momentum,
+        iterator_train__shuffle=True, # this is important! otherwise each batch across epochs is the same...
+        iterator_valid__shuffle=False,
+        train_split=model_config.train_split,
+        criterion=torch.nn.CrossEntropyLoss,
+        callbacks=callbacks,
+        **opt_params
     )
 
     return network.fit(train_set, np.array(train_set.targets)), network.module_
