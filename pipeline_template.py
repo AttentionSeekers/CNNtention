@@ -51,7 +51,15 @@ def train(train_set, model_config: ModelConfig, test_set):
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)
 
+    # logging training error
+    def train_err_scoring(net, X, y):
+            train_preds = net.predict(X)
+            return 100 - accuracy_score(X.targets, train_preds) * 100
 
+    callbacks.append(
+            # would be better to use caching, but this increases memory usage by a lot
+            ('train_err', EpochScoring(train_err_scoring, name='train_err', on_train=True, use_caching=False))
+        )
 
     # for final evaluations, we should use the entire training set and then we cannot track validation
     if model_config.train_split is not None:
@@ -61,25 +69,6 @@ def train(train_set, model_config: ModelConfig, test_set):
         callbacks.append(
             ('valid_err', EpochScoring(valid_err_scoring, name='valid_err'))
         )
-
-        #def train_err_scoring(net, X, y):
-        #    train_preds = net.predict(X)
-        #    return 100 - accuracy_score(y, train_preds) * 100
-
-        #callbacks.append(
-        #    # would be better to use caching, but this increases memory usage by a lot
-        #    ('train_err', EpochScoring(train_err_scoring, name='train_err', on_train=True, use_caching=False))
-        #)
-    else:
-        def train_err_scoring(net, X, y):
-            train_preds = net.predict(X)
-            return 100 - accuracy_score(X.targets, train_preds) * 100
-
-        callbacks.append(
-            # would be better to use caching, but this increases memory usage by a lot
-            ('train_err', EpochScoring(train_err_scoring, name='train_err', on_train=True, use_caching=False))
-        )
-
     # we should not evaluate on the test set until we are done with hyperparameter tuning
     if model_config.add_test_set_eval:
         def test_err_scoring(net, X, y):
