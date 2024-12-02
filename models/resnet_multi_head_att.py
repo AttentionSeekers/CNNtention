@@ -17,7 +17,7 @@ from torchvision.models.resnet import BasicBlock, Bottleneck
 from models.attention.multi_head_att import MultiHeadSelfAtt
 from models.originalBasicBlock import OriginalBasicBlock
 
-class ResnetSelfAtt(nn.Module):
+class ResnetMultiHeadAtt(nn.Module):
     def __init__(
         self,
         block: Type[Union[OriginalBasicBlock]],
