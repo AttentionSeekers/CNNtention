@@ -25,6 +25,7 @@ class MultiHeadSelfAtt(nn.Module):
 
         self.linear = nn.Conv2d(in_ch, in_ch, kernel_size=1)
         self.weights = nn.Parameter(torch.zeros(1))
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x, intermediate=False):
         N, ch, h, w = x.shape
@@ -33,19 +34,17 @@ class MultiHeadSelfAtt(nn.Module):
         key = self.key(x).view(N, self.num_heads, self.channels_per_head, h*w) # N, N_h, C_h, h*w
         val = self.val(x).view(N, self.num_heads, self.channels_per_head, h*w) # N, N_h, C_h, h*w
 
-        att = nn.Softmax(
-            (key.mT@query)*self.channels_per_head**-0.5 # N, N_h, h*w, h*w
+        att = self.softmax(
+            (key.mT@query)*self.channels_per_head**-0.5, # N, N_h, h*w, h*w
         )
 
         out = att@val.mT #N, N_h, h*w, h*w x N, N_h, C_h, h*w --> N, N_h, h*w, C_h
         out = out.mT # N, N_h, C_h, h*w
-        out = out.view(N, ch, h, w)
+        # https://stackoverflow.com/questions/66750391/runtimeerror-view-size-is-not-compatible-with-input-tensors-size-and-stride-a
+        out = out.contiguous().view(N, ch, h, w)
 
         out = self.linear(out)
         out = self.weights*out + x
 
         if intermediate: return out, att, query, key
         else: return out
-
-
-        
