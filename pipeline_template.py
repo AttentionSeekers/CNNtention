@@ -106,8 +106,8 @@ def train(train_set, model_config: ModelConfig, test_set):
     opt_params = {}
     opt_params['device'] = 'cuda' if torch.cuda.is_available() else 'cpu'
     mlflow.log_param('device', opt_params['device'])
-    if model_config.optimizer.__name__ != 'Adam':
-        opt_params['momentum'] = model_config.momentum
+    if not model_config.optimizer.__name__ == 'Adam':
+        opt_params['optimizer__momentum'] = model_config.momentum
     if model_config.optimizer.__class__.__name__ == 'ResnetMultiHeadAtt':
       opt_params['num_heads'] = model_config.num_heads
 
