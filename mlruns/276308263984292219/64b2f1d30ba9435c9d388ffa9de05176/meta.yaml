@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/276308263984292219/64b2f1d30ba9435c9d388ffa9de05176/artifacts
+end_time: 1733154424297
+entry_point_name: ''
+experiment_id: '276308263984292219'
+lifecycle_stage: active
+run_id: 64b2f1d30ba9435c9d388ffa9de05176
+run_name: sedate-chimp-363
+run_uuid: 64b2f1d30ba9435c9d388ffa9de05176
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733136023128
+status: 3
+tags: []
+user_id: root
