@@ -119,7 +119,7 @@ def train(train_set, model_config: ModelConfig, test_set):
         callbacks=callbacks
     )
 
-    return network.fit(train_set, np.array(train_set.targets))
+    return network.fit(train_set, np.array(train_set.targets)), network.module_
 
 
 def eval_model(network, test_set):
@@ -245,13 +245,13 @@ def main(config_id, debug=False):  # either add default param here or just call 
 
         train_set, test_set = load_data(config.data_config)
 
-        trained_network = train(train_set, config.model_config, test_set)
+        trained_network, model = train(train_set, config.model_config, test_set)
 
         train_loss, valid_loss, valid_err, train_err, test_err, accuracy, error = eval_model(trained_network, test_set)
 
         plot(config, train_loss, valid_loss, valid_err, train_err, test_err)
         
-        if config.model_config.log_model: mlflow.pytorch.log_model(trained_network, "model")
+        if config.model_config.log_model: mlflow.pytorch.log_model(model, "model")
 
 
 if __name__ == '__main__':
