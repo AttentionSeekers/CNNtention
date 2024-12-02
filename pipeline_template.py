@@ -219,11 +219,30 @@ def plot(config, train_loss, valid_loss, valid_err, train_err, test_err):
         plt.savefig(f'./plots/{config.underscored_lowercased_name}_train_and_test_err.png')
         plt.show()
 
+def print_hyperparams(config):
+  model_config = vars(config.model_config)
 
-def main(config_id):  # either add default param here or just call main from command line with arg
+  for key, value in model_config.items():
+    if key != 'model':
+        print(f"{key}: {value}")
+
+def main(config_id, debug=False):  # either add default param here or just call main from command line with arg
     config = configs[config_id]()
+    
+    if debug:
+        print(f'=== Model Details ===\n{config.model_config.model}')
+        print(f'\n=== Hyperparameter Details ===')
+        print_hyperparams(config)
+        print(f'\nExperiment name is {config.underscored_lowercased_name}')
+
     mlflow.set_experiment(experiment_name=config.underscored_lowercased_name)
-    with mlflow.start_run():
+
+    with mlflow.start_run() as run:
+        if debug:
+            print(f"\nRun ID: {mlflow.active_run().info.run_id}")
+            print(f"MLflow Tracking URI: {mlflow.get_tracking_uri()}")
+            print(f"Using device: {'CUDA' if torch.cuda.is_available() else 'CPU'}")
+
         train_set, test_set = load_data(config.data_config)
 
         trained_network = train(train_set, config.model_config, test_set)
