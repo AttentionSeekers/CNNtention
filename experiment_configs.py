@@ -47,6 +47,7 @@ class ModelConfig:
             train_split=None,
             scheduler=None,
             log_model=False,
+            num_heads=None,
             # should only be used for final evaluation, not for tuning
             add_test_set_eval=False
     ):
@@ -60,6 +61,7 @@ class ModelConfig:
         self.train_split = train_split
         self.scheduler = scheduler
         self.log_model = log_model
+        if num_heads != None: self.num_heads = num_heads
         self.add_test_set_eval = add_test_set_eval
 
 
@@ -224,6 +226,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                     weight_decay=0.0001,
                     momentum=0.9,
                     train_split=None,
+                    num_heads=4,
                     scheduler=LRScheduler(
                         policy=MultiStepLR,
                         milestones=[
