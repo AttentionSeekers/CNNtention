@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/833036032974162673/e424cebd75384e3e85c854098d60f3d2/artifacts
+end_time: 1733237852596
+entry_point_name: ''
+experiment_id: '833036032974162673'
+lifecycle_stage: active
+run_id: e424cebd75384e3e85c854098d60f3d2
+run_name: amusing-bee-223
+run_uuid: e424cebd75384e3e85c854098d60f3d2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733227097905
+status: 3
+tags: []
+user_id: root

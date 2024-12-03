@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/833036032974162673/a201c3ae74a1464f87da27be2fdef7dc/artifacts
+end_time: 1733236837678
+entry_point_name: ''
+experiment_id: '833036032974162673'
+lifecycle_stage: active
+run_id: a201c3ae74a1464f87da27be2fdef7dc
+run_name: invincible-croc-830
+run_uuid: a201c3ae74a1464f87da27be2fdef7dc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733226333407
+status: 3
+tags: []
+user_id: root
