@@ -227,8 +227,9 @@ def print_hyperparams(config):
     if key != 'model':
         print(f"{key}: {value}")
 
-def main(config_id, debug=False):  # either add default param here or just call main from command line with arg
-    config = configs[config_id]()
+def main(config_id, debug=False, supply_config=None):  # either add default param here or just call main from command line with arg
+    if supply_config is None: config = configs[config_id]()
+    else: config = supply_config[config_id]()
     
     if debug:
         print(f'=== Model Details ===\n{config.model_config.model}')

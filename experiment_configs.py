@@ -191,7 +191,6 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                     use_reg=True,
                     batch_size=128,
                     max_epochs=64000//(45000 // 128),
-                    weight_decay=0.0001,
                     momentum=0.9,
                     train_split=ValidSplit(cv=0.2),
                     scheduler=LRScheduler(
