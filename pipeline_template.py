@@ -111,8 +111,6 @@ def train(train_set, model_config: ModelConfig, test_set):
         optimizer=model_config.optimizer,
         batch_size=model_config.batch_size,
         max_epochs=model_config.max_epochs,
-        optimizer__weight_decay=model_config.weight_decay,
-        # optimizer__momentum=model_config.momentum,
         iterator_train__shuffle=True, # this is important! otherwise each batch across epochs is the same...
         iterator_valid__shuffle=False,
         train_split=model_config.train_split,
