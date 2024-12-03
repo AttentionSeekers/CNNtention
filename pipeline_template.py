@@ -53,8 +53,9 @@ def train(train_set, model_config: ModelConfig, test_set):
 
     # logging training error
     def train_err_scoring(net, X, y):
+            train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
             train_preds = net.predict(X)
-            return 100 - accuracy_score(y, train_preds) * 100
+            return 100 - accuracy_score(train_actual, train_preds) * 100
 
     callbacks.append(
             # would be better to use caching, but this increases memory usage by a lot
