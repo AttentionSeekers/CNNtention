@@ -97,8 +97,8 @@ def train(train_set, model_config: ModelConfig, test_set):
         opt_params['optimizer__momentum'] = model_config.momentum
     if model_config.optimizer.__class__.__name__ == 'ResnetMultiHeadAtt':
       opt_params['num_heads'] = model_config.num_heads
-    if model_config.reg is not None:
-        opt_params['optimizer__weight_decay'] = model_config.reg
+    if model_config.use_reg is True:
+        opt_params['optimizer__weight_decay'] = model_config.weight_decay
 
     # unfortunately, this does not seem to be logged automatically by the Skorch callback
     # so I did it manually (maybe you find out how it can be done by Skorch)

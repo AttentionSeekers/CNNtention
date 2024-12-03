@@ -40,10 +40,10 @@ class ModelConfig:
             model,
             lr=1e-4,
             optimizer=torch.optim.SGD,
-            reg=None,
             batch_size=128,
             max_epochs=50,
             weight_decay=0.0001,
+            use_reg=True,
             momentum=0.9,
             train_split=None,
             scheduler=None,
@@ -58,10 +58,10 @@ class ModelConfig:
         self.model = model
         self.lr = lr
         self.optimizer = optimizer
-        self.reg = reg
         self.batch_size = batch_size
         self.max_epochs = max_epochs
         self.weight_decay = weight_decay
+        self.use_reg = use_reg
         self.momentum = momentum
         self.train_split = train_split
         self.scheduler = scheduler
@@ -187,7 +187,8 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
         ModelConfig(model=ResnetSelfAtt(OriginalBasicBlock, [3,3,3], 10), 
                     lr=0.005,
                     optimizer=torch.optim.Adam,
-                    reg=0.01,
+                    weight_decay=0.001,
+                    use_reg=True,
                     batch_size=128,
                     max_epochs=64000//(45000 // 128),
                     weight_decay=0.0001,
