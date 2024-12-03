@@ -90,24 +90,20 @@ def train(train_set, model_config: ModelConfig, test_set):
         ml_flow_logger
     )
 
-    # unfortunately, this does not seem to be logged automatically by the Skorch callback
-    # so I did it manually (maybe you find out how it can be done by Skorch)
-    mlflow.log_param('learning_rate', model_config.lr)
-    mlflow.log_param('optimizer', model_config.optimizer.__name__)
-    mlflow.log_param('batch_size', model_config.batch_size)
-    mlflow.log_param('max_epochs', model_config.max_epochs)
-    mlflow.log_param('weight_decay', model_config.weight_decay)
-    mlflow.log_param("momentum", model_config.momentum)
-
     opt_params = {}
     opt_params['device'] = 'cuda' if torch.cuda.is_available() else 'cpu'
-    mlflow.log_param('device', opt_params['device'])
     if not model_config.optimizer.__name__ == 'Adam':
         opt_params['optimizer__momentum'] = model_config.momentum
     if model_config.optimizer.__class__.__name__ == 'ResnetMultiHeadAtt':
       opt_params['num_heads'] = model_config.num_heads
     if model_config.reg is not None:
         opt_params['optimizer__weight_decay'] = model_config.reg
+
+    # unfortunately, this does not seem to be logged automatically by the Skorch callback
+    # so I did it manually (maybe you find out how it can be done by Skorch)
+    # ^ Done, enjoy ~ Nikhil
+    mlflow.log_params(vars(model_config))
+    mlflow.log_params(opt_params)
 
     network = NeuralNetClassifier(
         model_config.model,
