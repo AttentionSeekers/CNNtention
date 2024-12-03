@@ -171,7 +171,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
         )
     ),
     "self_att_tuning": lambda: ExperimentConfig(
-        "SelfAtt ResNet20 with Logging",
+        "SelfAtt ResNet20",
         DataConfig(name='CIFAR-10',
                    test_size=10000,
                    train_transform=transforms.Compose([
@@ -187,6 +187,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
         ModelConfig(model=ResnetSelfAtt(OriginalBasicBlock, [3,3,3], 10), 
                     lr=0.005,
                     optimizer=torch.optim.Adam,
+                    reg=0.01,
                     batch_size=128,
                     max_epochs=64000//(45000 // 128),
                     weight_decay=0.0001,
@@ -196,12 +197,20 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                         policy=MultiStepLR,
                         milestones=[
                             32000 // (45000 // 128), # == 91
-                            48000 // (45000 // 128) # == 136
+                            115
+                            # 48000 // (45000 // 128) # == 136 #original
                         ],
                         gamma=0.1 # this is the multiplication factor ("divide it by 10")
                     ),
+                    log_model=True,
+                    early_stopping_params={
+                        'patience': 10,
+                        'threshold': 0.001,
+                        'threshold_mode': 'rel'
+                    },
+                    use_early_stopping=True,
                     add_test_set_eval=False,
-                    log_model=True)
+                    )
     ),
     "multi_head_att_tuning": lambda: ExperimentConfig(
         "MultiHeadAtt ResNet20 with Logging",
