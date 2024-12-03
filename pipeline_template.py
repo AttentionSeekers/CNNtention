@@ -54,11 +54,11 @@ def train(train_set, model_config: ModelConfig, test_set):
     # logging training error
     def train_err_scoring(net, X, y):
             train_preds = net.predict(X)
-            return 100 - accuracy_score(X.targets, train_preds) * 100
+            return 100 - accuracy_score(y, train_preds) * 100
 
     callbacks.append(
             # would be better to use caching, but this increases memory usage by a lot
-            ('train_err', EpochScoring(train_err_scoring, name='train_err', on_train=True, use_caching=False))
+            ('train_err', EpochScoring(train_err_scoring, name='train_err',  on_train=True, use_caching=False))
         )
 
     # for final evaluations, we should use the entire training set and then we cannot track validation
