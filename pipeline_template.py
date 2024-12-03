@@ -13,7 +13,7 @@ import torch, torchvision
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
-from skorch.callbacks import EpochScoring, MlflowLogger
+from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping
 
 from experiment_configs import configs, ModelConfig, DataConfig, RANDOM_VAR
 import numpy as np
@@ -69,6 +69,10 @@ def train(train_set, model_config: ModelConfig, test_set):
         callbacks.append(
             ('valid_err', EpochScoring(valid_err_scoring, name='valid_err'))
         )
+        if model_config.use_early_stopping is True: 
+            early_stop = EarlyStopping(monitor='valid_err', lower_is_better=True, **model_config.early_stopping_params)
+            callbacks.append(early_stop)
+
     # we should not evaluate on the test set until we are done with hyperparameter tuning
     if model_config.add_test_set_eval:
         def test_err_scoring(net, X, y):
@@ -77,6 +81,9 @@ def train(train_set, model_config: ModelConfig, test_set):
         callbacks.append(
             ('test_err', EpochScoring(test_err_scoring, name='test_err', use_caching=False, on_train=True))
         )
+        if model_config.use_early_stopping is True: 
+            early_stop = EarlyStopping(monitor='test_err', lower_is_better=True, **model_config.early_stopping_params)
+            callbacks.append(early_stop)
 
     ml_flow_logger = MlflowLogger()
     callbacks.append(
@@ -99,6 +106,8 @@ def train(train_set, model_config: ModelConfig, test_set):
         opt_params['optimizer__momentum'] = model_config.momentum
     if model_config.optimizer.__class__.__name__ == 'ResnetMultiHeadAtt':
       opt_params['num_heads'] = model_config.num_heads
+    if model_config.reg is not None:
+        opt_params['optimizer__weight_decay'] = model_config.reg
 
     network = NeuralNetClassifier(
         model_config.model,
