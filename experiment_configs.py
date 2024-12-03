@@ -48,6 +48,9 @@ class ModelConfig:
             scheduler=None,
             log_model=False,
             num_heads=None,
+            early_stopping_params:dict=None, 
+            # Should be a dict of params: patience, threshold, threshold_mode
+            use_early_stopping=False, 
             # should only be used for final evaluation, not for tuning
             add_test_set_eval=False
     ):
@@ -61,6 +64,8 @@ class ModelConfig:
         self.train_split = train_split
         self.scheduler = scheduler
         self.log_model = log_model
+        self.use_early_stopping = False
+        self.early_stopping_params = early_stopping_params
         if num_heads != None: self.num_heads = num_heads
         self.add_test_set_eval = add_test_set_eval
 
