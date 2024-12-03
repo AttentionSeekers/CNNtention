@@ -66,7 +66,7 @@ class ModelConfig:
         self.train_split = train_split
         self.scheduler = scheduler
         self.log_model = log_model
-        self.use_early_stopping = False
+        self.use_early_stopping = use_early_stopping
         self.early_stopping_params = early_stopping_params
         if num_heads != None: self.num_heads = num_heads
         self.add_test_set_eval = add_test_set_eval
