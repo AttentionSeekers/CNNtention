@@ -163,15 +163,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
             10
         )
     ),
-    "cifar10_resnet20_self_att_baseline_training": lambda: _get_cifar10_original_paper_training_config(
-"SelfAtt ResNet20 Tuning",
-        ResnetSelfAtt(
-            OriginalBasicBlock,
-            [3, 3, 3],
-            10
-        )
-    ),
-    "cifar10_resnet20_self_att_baseline_training_logging": lambda: ExperimentConfig(
+    "self_att_tuning": lambda: ExperimentConfig(
         "SelfAtt ResNet20 with Logging",
         DataConfig(name='CIFAR-10',
                    test_size=10000,
@@ -192,7 +184,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                     max_epochs=64000//(45000 // 128),
                     weight_decay=0.0001,
                     momentum=0.9,
-                    train_split=None,
+                    train_split=ValidSplit(cv=0.2),
                     scheduler=LRScheduler(
                         policy=MultiStepLR,
                         milestones=[
@@ -201,10 +193,10 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                         ],
                         gamma=0.1 # this is the multiplication factor ("divide it by 10")
                     ),
-                    add_test_set_eval=True,
+                    add_test_set_eval=False,
                     log_model=True)
     ),
-    "cifar10_resnet20_multi_head_att": lambda: ExperimentConfig(
+    "multi_head_att_tuning": lambda: ExperimentConfig(
         "MultiHeadAtt ResNet20 with Logging",
         DataConfig(name='CIFAR-10',
                    test_size=10000,
