@@ -40,6 +40,7 @@ class ModelConfig:
             model,
             lr=1e-4,
             optimizer=torch.optim.SGD,
+            reg=None,
             batch_size=128,
             max_epochs=50,
             weight_decay=0.0001,
@@ -57,6 +58,7 @@ class ModelConfig:
         self.model = model
         self.lr = lr
         self.optimizer = optimizer
+        self.reg = reg
         self.batch_size = batch_size
         self.max_epochs = max_epochs
         self.weight_decay = weight_decay
