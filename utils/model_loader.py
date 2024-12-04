@@ -54,12 +54,12 @@ class MLFlowModelLoader:
             print(f'Cannot load history.\n{e}')
         
     # private function
-    def _get_something(self, object, artifact_name, is_object=True):
+    def _get_something(self, object, artifact_name, is_object=True, device='cpu'):
         path = self._get_path(artifact_name)
         if path is not None:
             try:
                 if is_object:
-                    object.load_state_dict(torch.load(path))
+                    object.load_state_dict(torch.load(path, map_location=torch.device(device)))
                     if artifact_name == 'params.pth': object.eval()
                     print(f'Object {artifact_name} loaded.')
                 else:
@@ -71,15 +71,17 @@ class MLFlowModelLoader:
             print('This artifact does not exist. Please check your run_id and artifact name.')
             return None
 
-    def load_weights(self, model, artifact_name='params.pth'):
+    def load_weights(self, model, artifact_name='params.pth', device='cpu'):
         return self._get_something(model, 
                                    artifact_name, 
-                                   is_object=True)
+                                   is_object=True,
+                                   device=device)
         
-    def load_optimizer_state(self, optimizer, artifact_name='optimizer.pth'):
+    def load_optimizer_state(self, optimizer, artifact_name='optimizer.pth', device='cpu'):
         return self._get_something(optimizer, 
                                    artifact_name, 
-                                   is_object=True)
+                                   is_object=True,
+                                   device=device)
         
     def get_training_history(self, artifact_name='history.json'):
         return self._get_something(None, 
