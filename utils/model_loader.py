@@ -60,7 +60,7 @@ class MLFlowModelLoader:
             try:
                 if is_object:
                     object.load_state_dict(torch.load(path))
-                    object.eval()
+                    if artifact_name == 'params.pth': object.eval()
                     print(f'Object {artifact_name} loaded.')
                 else:
                     return self._get_history(path)
