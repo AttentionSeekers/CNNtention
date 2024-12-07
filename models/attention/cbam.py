@@ -112,4 +112,8 @@ class CBAM(nn.Module):
         _f = channel_attention * f
         spatial_attention = self.spatial_attention(_f)  # spatial_attention here equivalent to F"
         __f = spatial_attention * _f
-        return __f
+
+        # Implementing Residual connection
+        out = __f + f
+
+        return out

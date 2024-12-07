@@ -13,7 +13,7 @@ import torch, torchvision
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
-from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping
+from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping, ProgressBar
 
 from experiment_configs import configs, ModelConfig, DataConfig, RANDOM_VAR
 import numpy as np
@@ -46,31 +46,32 @@ def load_data(config: DataConfig):
 
 
 def train(train_set, model_config: ModelConfig, test_set):
-    callbacks = []
+    callbacks = [ProgressBar()]
 
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)
 
     # logging training error
     def train_err_scoring(net, X, y):
-            train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
-            train_preds = net.predict(X)
-            return 100 - accuracy_score(train_actual, train_preds) * 100
+        train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
+        train_preds = net.predict(X)
+        return 100 - accuracy_score(train_actual, train_preds) * 100
 
     callbacks.append(
-            # would be better to use caching, but this increases memory usage by a lot
-            ('train_err', EpochScoring(train_err_scoring, name='train_err',  on_train=True, use_caching=False))
-        )
+        # would be better to use caching, but this increases memory usage by a lot
+        ('train_err', EpochScoring(train_err_scoring, name='train_err', on_train=True, use_caching=False))
+    )
 
     # for final evaluations, we should use the entire training set and then we cannot track validation
     if model_config.train_split is not None:
         def valid_err_scoring(net, X, y):
             valid_preds = net.predict(X)
             return 1 - accuracy_score(y, valid_preds)
+
         callbacks.append(
             ('valid_err', EpochScoring(valid_err_scoring, name='valid_err'))
         )
-        if model_config.use_early_stopping is True: 
+        if model_config.use_early_stopping is True:
             early_stop = EarlyStopping(monitor='valid_err', lower_is_better=True, **model_config.early_stopping_params)
             callbacks.append(early_stop)
 
@@ -79,10 +80,11 @@ def train(train_set, model_config: ModelConfig, test_set):
         def test_err_scoring(net, X, y):
             test_preds = net.predict(test_set)
             return 100 - accuracy_score(test_set.targets, test_preds) * 100
+
         callbacks.append(
             ('test_err', EpochScoring(test_err_scoring, name='test_err', use_caching=False, on_train=True))
         )
-        if model_config.use_early_stopping is True: 
+        if model_config.use_early_stopping is True:
             early_stop = EarlyStopping(monitor='test_err', lower_is_better=True, **model_config.early_stopping_params)
             callbacks.append(early_stop)
 
@@ -96,7 +98,7 @@ def train(train_set, model_config: ModelConfig, test_set):
     if not model_config.optimizer.__name__ == 'Adam':
         opt_params['optimizer__momentum'] = model_config.momentum
     if model_config.optimizer.__class__.__name__ == 'ResnetMultiHeadAtt':
-      opt_params['num_heads'] = model_config.num_heads
+        opt_params['num_heads'] = model_config.num_heads
     if model_config.use_reg is True:
         opt_params['optimizer__weight_decay'] = model_config.weight_decay
 
@@ -112,7 +114,7 @@ def train(train_set, model_config: ModelConfig, test_set):
         optimizer=model_config.optimizer,
         batch_size=model_config.batch_size,
         max_epochs=model_config.max_epochs,
-        iterator_train__shuffle=True, # this is important! otherwise each batch across epochs is the same...
+        iterator_train__shuffle=True,  # this is important! otherwise each batch across epochs is the same...
         iterator_valid__shuffle=False,
         train_split=model_config.train_split,
         criterion=torch.nn.CrossEntropyLoss,
@@ -220,17 +222,22 @@ def plot(config, train_loss, valid_loss, valid_err, train_err, test_err):
         plt.savefig(f'./plots/{config.underscored_lowercased_name}_train_and_test_err.png')
         plt.show()
 
+
 def print_hyperparams(config):
-  model_config = vars(config.model_config)
+    model_config = vars(config.model_config)
 
-  for key, value in model_config.items():
-    if key != 'model':
-        print(f"{key}: {value}")
+    for key, value in model_config.items():
+        if key != 'model':
+            print(f"{key}: {value}")
 
-def main(config_id, debug=False, supply_config=None):  # either add default param here or just call main from command line with arg
-    if supply_config is None: config = configs[config_id]()
-    else: config = supply_config[config_id]()
-    
+
+def main(config_id, debug=False,
+         supply_config=None):  # either add default param here or just call main from command line with arg
+    if supply_config is None:
+        config = configs[config_id]()
+    else:
+        config = supply_config[config_id]()
+
     if debug:
         print(f'=== Model Details ===\n{config.model_config.model}')
         print(f'\n=== Hyperparameter Details ===')
@@ -252,7 +259,7 @@ def main(config_id, debug=False, supply_config=None):  # either add default para
         train_loss, valid_loss, valid_err, train_err, test_err, accuracy, error = eval_model(trained_network, test_set)
 
         plot(config, train_loss, valid_loss, valid_err, train_err, test_err)
-        
+
         if config.model_config.log_model: mlflow.pytorch.log_model(model, "model")
 
 
@@ -268,5 +275,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.config_id)
-
 

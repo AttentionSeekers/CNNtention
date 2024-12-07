@@ -65,7 +65,7 @@ class Viz:
         
         plt.subplot(1, plots, 1)
         plt.imshow(rgb_img)
-        plt.title(f"Original Image\nLabel: {label}\nIndex: {index}")
+        plt.title(f"Original Image\nLabel: {label}\nIndex: {index}", fontsize=10)
         plt.axis("off")
 
         model_names = [type(model).__name__ for model in self.models]
@@ -73,7 +73,7 @@ class Viz:
         for i, (v, name, p) in enumerate(zip(viz, model_names, preds), start=2):
             plt.subplot(1, plots, i)
             plt.imshow(v)
-            plt.title(f"Grad-CAM:\n{name}\nPred:{p}")
+            plt.title(f"Grad-CAM:\n{name}\nPred:{p}", fontsize=10)
             plt.axis("off")
 
         plt.tight_layout()

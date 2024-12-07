@@ -5,11 +5,11 @@ from skorch.dataset import ValidSplit
 from torch.optim.lr_scheduler import MultiStepLR
 from torchvision.transforms import transforms
 
-from models.cbamBlock import CBAMBlock
 from models.cifar10resnet import Cifar10ResNet
 from models.resnet_self_att import ResnetSelfAtt
 from models.resnet_multi_head_att import ResnetMultiHeadAtt
-from models.originalBasicBlock import OriginalBasicBlock
+from models.resnet_cbam import ResnetCBAM
+from models.original_basic_block import OriginalBasicBlock
 
 RANDOM_VAR = 10
 
@@ -162,14 +162,6 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
             10
         )
     ),
-    "cifar10_resnet20_cbam_baseline_training": lambda: _get_cifar10_original_paper_training_config(
-"CBAM ResNet20 Tuning",
-        Cifar10ResNet(
-            CBAMBlock, # TODO block not yet implemented properly
-            [3, 3, 3],
-            10
-        )
-    ),
     "self_att_tuning": lambda: ExperimentConfig(
         "SelfAtt ResNet20",
         DataConfig(name='CIFAR-10',
@@ -184,7 +176,7 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
             ])),
-        ModelConfig(model=ResnetSelfAtt(OriginalBasicBlock, [3,3,3], 10), 
+        ModelConfig(model=ResnetSelfAtt(OriginalBasicBlock, [3,3,3], 10),
                     lr=0.005,
                     optimizer=torch.optim.Adam,
                     weight_decay=0.001,
@@ -245,5 +237,38 @@ configs = { # mapping keys to lambdas to ensure that the configs are only loaded
                     ),
                     add_test_set_eval=True,
                     log_model=True)
-    )
+    ),
+    "cifar10_resnet20_cbam_training": lambda: ExperimentConfig(
+"CBAM ResNet20",
+DataConfig(name='CIFAR-10',
+                   test_size=10000,
+                   train_transform=transforms.Compose([
+                transforms.RandomHorizontalFlip(0.5),
+                transforms.RandomCrop(32, padding=4),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
+            ]),
+            test_transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
+            ])),
+        ModelConfig(model=ResnetCBAM(OriginalBasicBlock,[3, 3, 3],10),
+                    lr=0.005,
+                    optimizer=torch.optim.SGD,
+                    batch_size=128,
+                    max_epochs=64000//(45000 // 128),
+                    weight_decay=0.0001,
+                    momentum=0.9,
+                    train_split=None,
+                    scheduler=LRScheduler(
+                        policy=MultiStepLR,
+                        milestones=[
+                            32000 // (45000 // 128), # == 91
+                            48000 // (45000 // 128) # == 136
+                        ],
+                        gamma=0.1 # this is the multiplication factor ("divide it by 10")
+                    ),
+                    add_test_set_eval=True,
+                    log_model=True)
+    ),
 }
