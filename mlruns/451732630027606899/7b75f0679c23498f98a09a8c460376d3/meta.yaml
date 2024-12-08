@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/451732630027606899/7b75f0679c23498f98a09a8c460376d3/artifacts
+end_time: 1733675239662
+entry_point_name: ''
+experiment_id: '451732630027606899'
+lifecycle_stage: active
+run_id: 7b75f0679c23498f98a09a8c460376d3
+run_name: exultant-koi-566
+run_uuid: 7b75f0679c23498f98a09a8c460376d3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733667846547
+status: 3
+tags: []
+user_id: root

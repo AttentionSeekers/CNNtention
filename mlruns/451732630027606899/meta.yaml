@@ -1,0 +1,6 @@
+artifact_location: file:///content/drive/MyDrive/cs7643/mlruns/451732630027606899
+creation_time: 1733660463766
+experiment_id: '451732630027606899'
+last_update_time: 1733660463766
+lifecycle_stage: active
+name: selfatt_resnet20_mnist
