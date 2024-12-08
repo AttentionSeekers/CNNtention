@@ -1,0 +1,6 @@
+artifact_location: file:///teamspace/studios/this_studio/CNNtention/mlruns/237554920761476281
+creation_time: 1733591330656
+experiment_id: '237554920761476281'
+last_update_time: 1733591330656
+lifecycle_stage: active
+name: cbam_attention_resnet20_tuning_w/_reduction_16
