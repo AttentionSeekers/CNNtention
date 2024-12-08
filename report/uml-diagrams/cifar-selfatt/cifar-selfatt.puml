@@ -1,0 +1,45 @@
+' -*- coding: utf-8 -*-
+' Created on 2024-12-07 17:17:55 Saturday
+' @author: Nikhil Kapila
+
+@startuml
+skinparam backgroundColor #ffffff
+skinparam node {
+    BackgroundColor #eeeeee
+    BorderColor #000000
+    FontColor #000000
+}
+
+' title ResNet20 for CIFAR-10
+
+node "Input" as cifar10
+node "Conv2D\nBatchNorm\nReLU" as conv2d_relu
+node "SequentialBlock (16)" as seq16
+node "Self-Attention (16)" as selfatt16
+node "SequentialBlock (32)" as seq32
+node "Self-Attention (32)" as selfatt32
+node "SequentialBlock (64)" as seq64
+node "Self-Attention (64)" as selfatt64
+node "AvgPool" as avgpool
+node "Linear (64,10)" as linear
+node "Prediction" as pred
+
+cifar10 --> conv2d_relu
+conv2d_relu --> seq16
+seq16 -down-> seq16 : Residual Connection
+seq16 --> selfatt16
+selfatt16 -down-> selfatt16 : Residual Connection
+selfatt16 --> seq32
+seq32 -down-> seq32 : Residual Connection
+seq32 --> selfatt32
+selfatt32 -down-> selfatt32 : Residual Connection
+selfatt32 --> seq64
+seq64 -down-> seq64 : Residual Connection
+seq64 --> selfatt64
+selfatt64 -down-> selfatt64 : Residual Connection
+selfatt64 --> avgpool
+avgpool --> linear
+linear --> pred
+
+@enduml
+

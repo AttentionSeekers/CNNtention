@@ -1,0 +1,65 @@
+' -*- coding: utf-8 -*-
+' Created on 2024-12-08 13:22:10 Sunday
+' @author: Nikhil Kapila
+
+@startuml
+label diagrams [
+
+{{
+title Attention Augment
+
+skinparam backgroundColor #ffffff
+skinparam node {
+    BackgroundColor #eeeeee
+    BorderColor #000000
+    FontColor #000000
+}
+
+left to right direction
+
+node "SequentialBlock(x)" as seqx
+node "Attention\nMechanism(x)" as selfatt
+node "(+)" as plus
+node "(+)" as plus1
+node "input" as input
+
+input --> seqx
+input --> plus : Residual\nConnection
+seqx --> plus
+plus --> selfatt
+plus --> plus1 : Residual\nConnection
+selfatt --> plus1
+plus1 --> out
+}}
+
+{{
+title Attention Augment (Weighted)
+
+skinparam backgroundColor #ffffff
+skinparam node {
+    BackgroundColor #eeeeee
+    BorderColor #000000
+    FontColor #000000
+}
+
+left to right direction
+
+node "SequentialBlock(x)" as seqx
+node "Attention\nMechanism(x)" as selfatt
+node "(+)" as plus
+node "(+)" as plus1
+node "(xW)" as weight
+node "input" as input
+
+input --> seqx
+input --> plus : Residual\nConnection
+seqx --> plus
+plus --> selfatt
+plus --> weight
+weight --> plus1 : Weighted Residual\nConnection
+selfatt --> plus1
+plus1 --> out
+}}
+]
+@enduml
+    
