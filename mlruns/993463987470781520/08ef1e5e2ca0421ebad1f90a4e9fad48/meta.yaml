@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/993463987470781520/08ef1e5e2ca0421ebad1f90a4e9fad48/artifacts
+end_time: 1733671485838
+entry_point_name: ''
+experiment_id: '993463987470781520'
+lifecycle_stage: active
+run_id: 08ef1e5e2ca0421ebad1f90a4e9fad48
+run_name: polite-bee-466
+run_uuid: 08ef1e5e2ca0421ebad1f90a4e9fad48
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733668911609
+status: 3
+tags: []
+user_id: root
