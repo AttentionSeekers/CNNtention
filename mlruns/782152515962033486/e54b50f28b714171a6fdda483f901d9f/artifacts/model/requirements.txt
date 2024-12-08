@@ -1,0 +1,12 @@
+mlflow==2.18.0
+astunparse==1.6.3
+cloudpickle==3.1.0
+defusedxml==0.7.1
+numpy==1.26.4
+optree==0.13.1
+pandas==2.2.2
+pathlib==1.0.1
+pydot==3.0.3
+torch==2.5.1
+torchvision==0.20.1
+tqdm==4.66.6
