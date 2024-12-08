@@ -53,7 +53,11 @@ def train(train_set, model_config: ModelConfig, test_set):
 
     # logging training error
     def train_err_scoring(net, X, y):
+        if hasattr(X, 'indices'):  # when using ValSplit(.1)
             train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
+        else:  # when using the full dataset without valsplit
+            train_actual = np.array(X.targets)
+            # train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
             train_preds = net.predict(X)
             return 100 - accuracy_score(train_actual, train_preds) * 100
 
