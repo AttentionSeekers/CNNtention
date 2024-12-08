@@ -54,7 +54,7 @@ class MLFlowModelLoader:
             print(f'Cannot load history.\n{e}')
         
     # private function
-    def _get_something(self, object, artifact_name, is_object=True, device='cpu'):
+    def _get_something(self, object, artifact_name, is_object=True, device='cuda' if torch.cuda.is_available() else 'cpu'):
         path = self._get_path(artifact_name)
         if path is not None:
             try:
