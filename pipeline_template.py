@@ -39,6 +39,15 @@ def load_data(config: DataConfig):
                                                  download=True,
                                                  transform=config.test_transform
                                                  )
+    elif config.name == 'MNIST':
+        train_set = torchvision.datasets.MNIST(root='./data',
+                                                  train=True,
+                                                  download=True,
+                                                  transform=config.train_transform)
+        test_set = torchvision.datasets.MNIST(root='./data',
+                                                 train=False,
+                                                 download=True,
+                                                 transform=config.test_transform)
     else:
         raise ValueError('Unknown dataset')
 
