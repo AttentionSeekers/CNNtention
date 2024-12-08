@@ -9,7 +9,7 @@ label diagrams [
 title Attention Augment
 
 skinparam backgroundColor #ffffff
-skinparam node {
+skinparam rectangle {
     BackgroundColor #eeeeee
     BorderColor #000000
     FontColor #000000
@@ -17,11 +17,11 @@ skinparam node {
 
 left to right direction
 
-node "SequentialBlock(x)" as seqx
-node "Attention\nMechanism(x)" as selfatt
-node "(+)" as plus
-node "(+)" as plus1
-node "input" as input
+rectangle "SequentialBlock(x)" as seqx
+rectangle "Attention\nMechanism(x)" as selfatt
+rectangle "(+)" as plus
+rectangle "(+)" as plus1
+rectangle "input" as input
 
 input --> seqx
 input --> plus : Residual\nConnection
@@ -36,7 +36,7 @@ plus1 --> out
 title Attention Augment (Weighted)
 
 skinparam backgroundColor #ffffff
-skinparam node {
+skinparam rectangle {
     BackgroundColor #eeeeee
     BorderColor #000000
     FontColor #000000
@@ -44,12 +44,12 @@ skinparam node {
 
 left to right direction
 
-node "SequentialBlock(x)" as seqx
-node "Attention\nMechanism(x)" as selfatt
-node "(+)" as plus
-node "(+)" as plus1
-node "(xW)" as weight
-node "input" as input
+rectangle "SequentialBlock(x)" as seqx
+rectangle "Attention\nMechanism(x)" as selfatt
+rectangle "(+)" as plus
+rectangle "(+)" as plus1
+rectangle "(xW)" as weight
+rectangle "input" as input
 
 input --> seqx
 input --> plus : Residual\nConnection
@@ -62,4 +62,4 @@ plus1 --> out
 }}
 ]
 @enduml
-    
+
