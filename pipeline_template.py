@@ -13,7 +13,7 @@ import torch, torchvision
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
-from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping, ProgressBar
+from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping #, ProgressBar
 
 from experiment_configs import configs, ModelConfig, DataConfig, RANDOM_VAR
 import numpy as np
@@ -55,7 +55,8 @@ def load_data(config: DataConfig):
 
 
 def train(train_set, model_config: ModelConfig, test_set):
-    callbacks = [ProgressBar()]
+    # callbacks = [ProgressBar()]
+    callbacks = []
 
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)
@@ -67,8 +68,8 @@ def train(train_set, model_config: ModelConfig, test_set):
         else:  # when using the full dataset without valsplit
             train_actual = np.array(X.targets)
             # train_actual = np.array([X.dataset.targets[idx] for idx in X.indices])
-            train_preds = net.predict(X)
-            return 100 - accuracy_score(train_actual, train_preds) * 100
+        train_preds = net.predict(X)
+        return 100 - accuracy_score(train_actual, train_preds) * 100
 
     callbacks.append(
             # would be better to use caching, but this increases memory usage by a lot
