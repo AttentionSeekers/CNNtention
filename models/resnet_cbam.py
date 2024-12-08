@@ -23,7 +23,8 @@ class ResnetCBAM(nn.Module):
             self,
             block: Type[Union[OriginalBasicBlock]],
             layers: List[int],
-            num_classes: int = 10,  # 1000,
+            num_classes: int = 10, 
+            reduction: int = 8,
     ) -> None:
         super().__init__()
         # We adjust the entry convolution, therefore inplanes (number of input channels) needs to be adjusted too
@@ -45,11 +46,11 @@ class ResnetCBAM(nn.Module):
 
         # NK: augmented self attention blocks between resnet blocks
         self.layer1 = self._make_layer(block, 16, layers[0], stride=1)
-        self.att1 = CBAM(c_in=16, reduction=8, kernel_size=7)
+        self.att1 = CBAM(c_in=16, reduction=reduction, kernel_size=7)
         self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
-        self.att2 = CBAM(c_in=32, reduction=8, kernel_size=7)
+        self.att2 = CBAM(c_in=32, reduction=reduction, kernel_size=7)
         self.layer3 = self._make_layer(block, 64, layers[2], stride=2)
-        self.att3 = CBAM(c_in=64, reduction=8, kernel_size=7)
+        self.att3 = CBAM(c_in=64, reduction=reduction, kernel_size=7)
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 

@@ -1,0 +1,15 @@
+artifact_uri: file:///teamspace/studios/this_studio/CNNtention/mlruns/953425965798775221/718c203dc1414d2fad17427583635b7c/artifacts
+end_time: 1733584260560
+entry_point_name: ''
+experiment_id: '953425965798775221'
+lifecycle_stage: active
+run_id: 718c203dc1414d2fad17427583635b7c
+run_name: classy-midge-345
+run_uuid: 718c203dc1414d2fad17427583635b7c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733574788714
+status: 3
+tags: []
+user_id: zeus

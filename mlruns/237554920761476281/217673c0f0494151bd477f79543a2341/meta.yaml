@@ -1,0 +1,15 @@
+artifact_uri: file:///teamspace/studios/this_studio/CNNtention/mlruns/237554920761476281/217673c0f0494151bd477f79543a2341/artifacts
+end_time: 1733602215809
+entry_point_name: ''
+experiment_id: '237554920761476281'
+lifecycle_stage: active
+run_id: 217673c0f0494151bd477f79543a2341
+run_name: stately-squid-499
+run_uuid: 217673c0f0494151bd477f79543a2341
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733591330664
+status: 4
+tags: []
+user_id: zeus

@@ -1,0 +1,15 @@
+artifact_uri: file:///teamspace/studios/this_studio/CNNtention/mlruns/406784709186655786/5dae6de45fac4f40988fbee5ccb21e28/artifacts
+end_time: 1733602155567
+entry_point_name: ''
+experiment_id: '406784709186655786'
+lifecycle_stage: active
+run_id: 5dae6de45fac4f40988fbee5ccb21e28
+run_name: languid-sloth-501
+run_uuid: 5dae6de45fac4f40988fbee5ccb21e28
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733591249553
+status: 4
+tags: []
+user_id: zeus

@@ -13,7 +13,7 @@ import torch, torchvision
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score
 from skorch import NeuralNetClassifier
-from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping
+from skorch.callbacks import EpochScoring, MlflowLogger, EarlyStopping, ProgressBar
 
 from experiment_configs import configs, ModelConfig, DataConfig, RANDOM_VAR
 import numpy as np
@@ -46,7 +46,7 @@ def load_data(config: DataConfig):
 
 
 def train(train_set, model_config: ModelConfig, test_set):
-    callbacks = []
+    callbacks = [ProgressBar()]
 
     if model_config.scheduler is not None:
         callbacks.append(model_config.scheduler)

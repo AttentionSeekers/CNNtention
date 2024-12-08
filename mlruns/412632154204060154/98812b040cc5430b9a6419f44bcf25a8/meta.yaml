@@ -1,0 +1,15 @@
+artifact_uri: file:///teamspace/studios/this_studio/CNNtention/mlruns/412632154204060154/98812b040cc5430b9a6419f44bcf25a8/artifacts
+end_time: 1733665678302
+entry_point_name: ''
+experiment_id: '412632154204060154'
+lifecycle_stage: active
+run_id: 98812b040cc5430b9a6419f44bcf25a8
+run_name: smiling-yak-254
+run_uuid: 98812b040cc5430b9a6419f44bcf25a8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733656059014
+status: 3
+tags: []
+user_id: zeus
