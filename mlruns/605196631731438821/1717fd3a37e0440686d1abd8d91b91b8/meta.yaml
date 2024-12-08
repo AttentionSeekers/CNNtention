@@ -1,0 +1,15 @@
+artifact_uri: file:///teamspace/studios/this_studio/CNNtention/mlruns/605196631731438821/1717fd3a37e0440686d1abd8d91b91b8/artifacts
+end_time: 1733679925968
+entry_point_name: ''
+experiment_id: '605196631731438821'
+lifecycle_stage: active
+run_id: 1717fd3a37e0440686d1abd8d91b91b8
+run_name: angry-slug-1
+run_uuid: 1717fd3a37e0440686d1abd8d91b91b8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733678022703
+status: 3
+tags: []
+user_id: zeus

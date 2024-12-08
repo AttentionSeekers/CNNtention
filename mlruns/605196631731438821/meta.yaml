@@ -1,0 +1,6 @@
+artifact_location: file:///teamspace/studios/this_studio/CNNtention/mlruns/605196631731438821
+creation_time: 1733677662109
+experiment_id: '605196631731438821'
+last_update_time: 1733677662109
+lifecycle_stage: active
+name: cbam_resnet20_mnist
