@@ -1,0 +1,6 @@
+artifact_location: file:///content/drive/MyDrive/cs7643/mlruns/142325963722404463
+creation_time: 1733727710838
+experiment_id: '142325963722404463'
+last_update_time: 1733727710838
+lifecycle_stage: active
+name: mnist_multiheadatt_resnet20_final

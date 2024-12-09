@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/142325963722404463/b88ac087f70044f68929fbdc25f94599/artifacts
+end_time: 1733736062999
+entry_point_name: ''
+experiment_id: '142325963722404463'
+lifecycle_stage: active
+run_id: b88ac087f70044f68929fbdc25f94599
+run_name: bedecked-duck-421
+run_uuid: b88ac087f70044f68929fbdc25f94599
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733727892318
+status: 3
+tags: []
+user_id: root
