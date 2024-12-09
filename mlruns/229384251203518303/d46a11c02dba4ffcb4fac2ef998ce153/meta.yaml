@@ -1,0 +1,15 @@
+artifact_uri: file:///teamspace/studios/this_studio/mlruns/229384251203518303/d46a11c02dba4ffcb4fac2ef998ce153/artifacts
+end_time: 1733776544443
+entry_point_name: ''
+experiment_id: '229384251203518303'
+lifecycle_stage: active
+run_id: d46a11c02dba4ffcb4fac2ef998ce153
+run_name: colorful-mouse-395
+run_uuid: d46a11c02dba4ffcb4fac2ef998ce153
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733769979077
+status: 3
+tags: []
+user_id: zeus
