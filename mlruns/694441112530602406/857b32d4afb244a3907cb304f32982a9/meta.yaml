@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/694441112530602406/857b32d4afb244a3907cb304f32982a9/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '694441112530602406'
+lifecycle_stage: active
+run_id: 857b32d4afb244a3907cb304f32982a9
+run_name: victorious-flea-987
+run_uuid: 857b32d4afb244a3907cb304f32982a9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733678134026
+status: 1
+tags: []
+user_id: root
