@@ -33,13 +33,26 @@ class MLFlowPlotter:
         return [mlflow.tracking.MlflowClient().get_metric_history(run_id=run, key=metric_key)\
                         for run in runs]
     
-    def make_plot(self, title=None):
-        epoch = max(self.epochs) # the x axis
-        for val, label in zip(self.values, self.model_names):
+    def make_plot(self, title=None, metric_key=None):
+        # epoch = max(self.epochs) # the x axis
+        
+        if metric_key is not None:
+            metrics = [mlflow.tracking.MlflowClient().get_metric_history(run_id=run, key=metric_key)\
+                        for run in self.run_id_list]
+            # epochs = [[plot.step for plot in metrics[i]] for i in range(len(metrics))]
+            values = [[plot.value for plot in metrics[i]] for i in range(len(metrics))]
+            # epoch = max(epochs)
+        else:
+            metric_key = self.metric_key
+            values = self.values
+            # epochs = self.epochs
+        
+        for val, label in zip(values, self.model_names):
             plt.plot(val, label=label)
+        
         plt.xlabel('epochs')
         plt.ylabel(self.metric_key)
-        if title is None: plt.title(f'{self.metric_key} performance for different models')
+        if title is None: plt.title(f'{metric_key} performance for different models')
         plt.legend()
         plt.show()
         
