@@ -1,0 +1,6 @@
+artifact_location: file:///content/drive/MyDrive/cs7643/mlruns/998492728198223474
+creation_time: 1733690972854
+experiment_id: '998492728198223474'
+last_update_time: 1733690972854
+lifecycle_stage: active
+name: cifar10_resnet20_cbam_training
