@@ -82,7 +82,17 @@ class MLFlowModelLoader:
                                    artifact_name, 
                                    is_object=True,
                                    device=device)
-        
+    
+    def get_metric_history(self, metric_key='train_err'):
+        # https://stackoverflow.com/questions/60616430/mlflow-how-to-read-metrics-or-params-from-an-existing-run
+        if self.ui_open is False: raise Exception('Switch ON mlflow ui to run this method.')
+
+        return self.client.get_metric_history(run_id=self.run_id,
+                                              key=metric_key)
+
+    def get_mlflow_client(self):
+        return self.client
+
     def get_training_history(self, artifact_name='history.json'):
         return self._get_something(None, 
                                    artifact_name, 
