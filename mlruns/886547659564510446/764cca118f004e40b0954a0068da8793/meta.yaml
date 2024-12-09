@@ -1,0 +1,15 @@
+artifact_uri: file:///content/drive/MyDrive/cs7643/mlruns/886547659564510446/764cca118f004e40b0954a0068da8793/artifacts
+end_time: 1733375084519
+entry_point_name: ''
+experiment_id: '886547659564510446'
+lifecycle_stage: active
+run_id: 764cca118f004e40b0954a0068da8793
+run_name: bittersweet-wren-868
+run_uuid: 764cca118f004e40b0954a0068da8793
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733364636928
+status: 3
+tags: []
+user_id: zeus
