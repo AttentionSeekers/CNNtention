@@ -55,5 +55,8 @@ class MLFlowPlotter:
         if title is None: plt.title(f'{metric_key} performance for different models')
         else: plt.title(title)
         plt.legend()
+        plt.tight_layout()
+        fig = plt.gcf()
         plt.show()
+        return fig
         
