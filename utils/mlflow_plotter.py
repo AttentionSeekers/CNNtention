@@ -33,6 +33,36 @@ class MLFlowPlotter:
         return [mlflow.tracking.MlflowClient().get_metric_history(run_id=run, key=metric_key)\
                         for run in runs]
     
+    def make_plot_two_metrics(self, title=None, metric_keys=None, error=True):
+        if metric_keys is not None and len(metric_keys) > 0:
+            metrics = {key: [mlflow.tracking.MlflowClient().get_metric_history(run_id=run, key=key)
+                            for run in self.run_id_list]
+                    for key in metric_keys}
+            
+            values = {key: [[plot.value for plot in metrics[key][i]] for i in range(len(metrics[key]))]
+                    for key in metric_keys}
+        else:
+            metric_keys = [self.metric_key]
+            values = {metric_keys[0]: self.values}
+        
+        for key in metric_keys:
+            for val, label in zip(values[key], self.model_names):
+                plt.plot(val, label=f"{label} ({key})")
+        
+        plt.xlabel('epochs')
+        if error is True: plt.ylabel('error')
+        else: plt.ylabel('loss')
+
+        if title is None: plt.title(f'{", ".join(metric_keys)} performance for different models')
+        else: plt.title(title)
+        
+        plt.legend()
+        plt.tight_layout()
+        fig = plt.gcf()
+        plt.show()
+        
+        return fig
+
     def make_plot(self, title=None, metric_key=None):
         # epoch = max(self.epochs) # the x axis
         
