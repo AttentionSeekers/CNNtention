@@ -17,7 +17,7 @@ skinparam rectangle {
 
 left to right direction
 
-rectangle "SequentialBlock(x)" as seqx
+rectangle "Feature\nExtractor(x)" as seqx
 rectangle "Attention\nMechanism(x)" as selfatt
 rectangle "(+)" as plus
 rectangle "(+)" as plus1
@@ -44,7 +44,7 @@ skinparam rectangle {
 
 left to right direction
 
-rectangle "SequentialBlock(x)" as seqx
+rectangle "Feature\nExtractor(x)" as seqx
 rectangle "Attention\nMechanism(x)" as selfatt
 rectangle "(+)" as plus
 rectangle "(+)" as plus1
@@ -55,9 +55,9 @@ input --> seqx
 input --> plus : Residual\nConnection
 seqx --> plus
 plus --> selfatt
-plus --> weight
-weight --> plus1 : Weighted Residual\nConnection
-selfatt --> plus1
+selfatt --> weight
+weight --> plus1 : Weighted\nAttention
+plus --> plus1 : Residual\nConnection
 plus1 --> out
 }}
 ]
