@@ -17,8 +17,9 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 class Viz:
-    def __init__(self, models, target_layers, device='cpu'):
+    def __init__(self, models, target_layers, dataset='CIFAR-10', device='cpu'):
         self.models = models
+        self.dataset = dataset
         for model in self.models: 
             model.eval()
             model.to(device)
@@ -30,11 +31,17 @@ class Viz:
                 transforms.RandomCrop(32, padding=4),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.4918687901200927, 0.49185976472299225, 0.4918583862227116], std=[0.24697121702736, 0.24696766978537033, 0.2469719877121087])
+            ]) if self.dataset == 'CIFAR-10' else transforms.Compose([
+                transforms.ToTensor(),
             ])
         
-    def _load_data(self, name='CIFAR-10'):
-        if name == 'CIFAR-10':
+    def _load_data(self):
+        if self.dataset == 'CIFAR-10':
             train_set = torchvision.datasets.CIFAR10(root='../data',
+                                                    train=False,
+                                                    download=True)
+        elif self.dataset == 'MNIST':
+            train_set = torchvision.datasets.MNIST(root='../data',
                                                     train=False,
                                                     download=True)
         return train_set
@@ -45,7 +52,8 @@ class Viz:
         data = self._load_data()
         if index is None: index = random.sample(range(len(data)), 1)[0]
         image, label = data[index]
-        input = self.transform(image).unsqueeze(0) #unsqueeze to add batch dimension
+        input = self.transform(image).unsqueeze(0) if self.dataset == 'CIFAR-10' else self.transform(image).unsqueeze(0).unsqueeze(0)
+        #unsqueeze to add batch dimension
         
         # torch.random.set_manual_seed(10)
         
@@ -54,7 +62,9 @@ class Viz:
         targets = [ClassifierOutputTarget(label)]
         grayscale_cams = [cam(input, targets)[0] for cam in cams]
         rgb_img = np.array(image) / 255.0
-        viz = [show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True) for grayscale_cam in grayscale_cams]
+
+        use_rgb = True if self.dataset == 'CIFAR-10' else False
+        viz = [show_cam_on_image(rgb_img, grayscale_cam, use_rgb=use_rgb) for grayscale_cam in grayscale_cams]
 
         with torch.no_grad():
             torch.manual_seed(10)
@@ -77,7 +87,10 @@ class Viz:
             plt.axis("off")
 
         plt.tight_layout()
+        fig = plt.gcf()
         plt.show()
+
+        return fig
 
     def get_gradcam(self, index=None):
         torch.manual_seed(10)
