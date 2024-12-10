@@ -53,6 +53,7 @@ class MLFlowPlotter:
         plt.xlabel('epochs')
         plt.ylabel(self.metric_key)
         if title is None: plt.title(f'{metric_key} performance for different models')
+        else: plt.title(title)
         plt.legend()
         plt.show()
         
