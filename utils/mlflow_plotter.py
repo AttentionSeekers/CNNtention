@@ -23,7 +23,7 @@ class MLFlowPlotter:
         self.epochs = [[plot.step for plot in self.metrics[i]] for i in range(len(self.metrics))]
         self.values = [[plot.value for plot in self.metrics[i]] for i in range(len(self.metrics))]
 
-        # if ui_open is False: raise Exception('Switch ON mlflow ui to run the Plotter.')
+        if ui_open is False: raise Exception('Switch ON mlflow ui to run the Plotter.')
 
     def get_history(self):
         return self.metrics
