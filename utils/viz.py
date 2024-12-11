@@ -52,16 +52,15 @@ class Viz:
         data = self._load_data()
         if index is None: index = random.sample(range(len(data)), 1)[0]
         image, label = data[index]
-        input = self.transform(image).unsqueeze(0) if self.dataset == 'CIFAR-10' else self.transform(image).unsqueeze(0).unsqueeze(0)
         #unsqueeze to add batch dimension
-        
-        # torch.random.set_manual_seed(10)
+        input = self.transform(image).unsqueeze(0)
         
         for model in self.models: model.zero_grad()
         cams = objects
         targets = [ClassifierOutputTarget(label)]
         grayscale_cams = [cam(input, targets)[0] for cam in cams]
         rgb_img = np.array(image) / 255.0
+        if self.dataset == 'MNIST': rgb_img = np.stack([rgb_img] * 3, axis=-1)
 
         use_rgb = True if self.dataset == 'CIFAR-10' else False
         viz = [show_cam_on_image(rgb_img, grayscale_cam, use_rgb=use_rgb) for grayscale_cam in grayscale_cams]
@@ -74,7 +73,8 @@ class Viz:
         plots = len(viz)+1 # number of subplots = 1 for image and other models
         
         plt.subplot(1, plots, 1)
-        plt.imshow(rgb_img)
+        if self.dataset == 'MNIST': plt.imshow(image, cmap='gray')
+        else: plt.imshow(rgb_img)
         plt.title(f"Original Image\nLabel: {label}\nIndex: {index}", fontsize=10)
         plt.axis("off")
 
